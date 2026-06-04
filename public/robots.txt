@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://chinabridge-global.vercel.app/sitemap.xml

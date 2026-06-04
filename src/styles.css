@@ -63,6 +63,14 @@ button, input, textarea {
 .brand {
   font-weight: 700;
   font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+
+.brand-logo {
+  height: 48px;
+  width: auto;
+  display: block;
 }
 
 .site-nav {
@@ -472,6 +480,17 @@ button, input, textarea {
   max-width: 1100px;
   margin: 0 auto;
   padding: 2rem;
+  min-height: 100vh;
+}
+
+.admin-logo-area {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.admin-logo {
+  height: 52px;
+  width: auto;
 }
 
 .admin-login,
@@ -667,19 +686,6 @@ code {
 
   .cta-panel {
     padding: 2rem 1.25rem;
-  }
-
-  .admin-page {
-    padding: 1rem;
-  }
-
-  .admin-login,
-  .admin-panel {
-    padding: 1.5rem;
-  }
-
-  .upload-card {
-    padding: 0.85rem;
   }
 
   .button {

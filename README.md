@@ -1,15 +1,14 @@
-# ChinaAgent-Global
-# China Agent Clone
+# ChinaBridge Global
 
-这是一个基于 React + Vite 的网站模板，适合复制并替换 `china-agent.com` 的页面布局、移动端适配和内容管理功能。
+基于 React + Vite 的品牌网站，含 Firebase CMS 内容管理后台。面向海外用户的供应商验证与工厂审核服务展示站。
 
 ## 特性
 
 - React + Vite 前端项目
-- Firebase 内容管理（Firestore）与图片上传（Storage）
+- Firebase 内容管理（Firestore），图片以 base64 存入 Firestore 文档
 - 管理后台页面：修改文案、上传图片
 - 移动端响应式布局
-- 可直接部署到 Firebase Hosting
+- 可直接部署到 Vercel / Netlify 等静态托管平台
 
 ## 目录结构
 
@@ -41,28 +40,21 @@ npm run dev
 
 5. 在浏览器访问 `http://localhost:5173`
 
-6. 管理后台访问 `http://localhost:5173/admin`，默认管理密码是 `pm2026`。
+6. 管理后台访问 `http://localhost:5173/admin`，默认管理密码是 `cb2026`。
 
 ## 配置 Firebase
 
 1. 登录 Firebase 控制台：https://console.firebase.google.com
 2. 创建一个项目。
-3. 在项目设置中获取 Web 应用配置（API key、projectId、storageBucket 等）。
-4. 打开 `src/firebase.js`，替换占位符配置。
-5. 在 Firestore 中创建集合 `site`，文档 ID 为 `content`。
-6. 在 Storage 中启用规则：
-
-```js
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if request.auth != null;
-    }
-  }
-}
-```
+3. 在项目设置中获取 Web 应用配置（API key、projectId 等）。
+4. 打开 `src/firebase.js`，替换占位符配置（**注意去掉键值两端的尖括号 `<>`**）。
+5. 在 Firestore 中创建数据库（测试模式），集合 `site`。
+   - 无需启用 Storage —— 图片以 base64 格式直接存入 Firestore 文档。
+   - 无需升级 Blaze 计划或绑定信用卡。
 
 如果你不设置 Firebase，网站仍然会使用默认本地演示内容，但管理后台保存功能将不可用。
+
+> 图片处理说明：图片通过浏览器 FileReader 转为 base64 字符串，随其他内容一起保存到 Firestore 文档中。无需 Firebase Storage，免信用卡。单张图片建议控制在 500KB 以内。
 
 ## 一键托管推荐
 
@@ -203,7 +195,7 @@ firebase deploy
 
 ## 后续替换建议
 
-- 替换 `src/pages/HomePage.jsx` 中的文案和布局段落。
+- 在管理后台 `/admin` 直接修改所有文案、SEO 信息和图片。
 - 在 `src/styles.css` 调整颜色、字体、间距以匹配目标站点风格。
-- 上传自有图片后，将 `hero.backgroundImage` 和 `about.image` 替换为真实链接。
-- 当你准备好域名时，可在 Firebase Hosting 中绑定自定义域名。
+- 上传自有图片后，页面会自动使用新图片替换默认渐变背景。
+- 当你准备好域名时，可在 Vercel/Netlify 中绑定自定义域名。

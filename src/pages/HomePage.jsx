@@ -23,27 +23,27 @@ function HomePage({ content, loading }) {
     event.preventDefault();
 
     if (!form.name || !form.email || !form.message) {
-      setFeedback('请填写姓名、邮箱和咨询内容后再提交。');
+      setFeedback('Please fill in your name, email and message before submitting.');
       return;
     }
 
-    const subject = encodeURIComponent(`网站咨询：${form.name}`);
+    const subject = encodeURIComponent(`Website Inquiry: ${form.name}`);
     const body = encodeURIComponent(
-      `姓名：${form.name}\n公司：${form.company || '无'}\n邮箱：${form.email}\n\n咨询内容：\n${form.message}`
+      `Name: ${form.name}\nCompany: ${form.company || 'N/A'}\nEmail: ${form.email}\n\nMessage:\n${form.message}`
     );
     window.location.href = `mailto:${content.contact.email}?subject=${subject}&body=${body}`;
     setSubmitted(true);
   }
 
   if (loading) {
-    return <div className="loading-panel">正在加载内容...</div>;
+    return <div className="loading-panel">Loading content...</div>;
   }
 
   return (
     <div className="page-home">
       <section className="hero-section" style={heroStyle}>
         <div className="hero-copy">
-          <p className="eyebrow">中国供应商风险控制</p>
+          <p className="eyebrow">CHINA SUPPLIER RISK CONTROL</p>
           <h1>{content.hero.title}</h1>
           <p className="hero-description">{content.hero.subtitle}</p>
           <div className="hero-actions">
@@ -51,7 +51,7 @@ function HomePage({ content, loading }) {
               {content.hero.ctaText}
             </a>
             <a className="button button-secondary" href={`mailto:${content.contact.email}`}>
-              直接邮件咨询
+              Email Us Directly
             </a>
           </div>
         </div>
@@ -59,8 +59,8 @@ function HomePage({ content, loading }) {
 
       <section className="section services-section" id="services">
         <div className="section-header">
-          <h2>你当前最需要的服务</h2>
-          <p>从供应商核查到合同保护，再到现场陪访与问题处理，一次覆盖采购关键环节。</p>
+          <h2>The Services You Need Right Now</h2>
+          <p>From supplier verification to contract protection, factory visits, and problem resolution — covering every critical step of procurement.</p>
         </div>
         <div className="service-grid">
           {content.services.map((item, index) => (
@@ -75,8 +75,8 @@ function HomePage({ content, loading }) {
 
       <section className="section highlights-section">
         <div className="section-header">
-          <h2>我们工作时的三个原则</h2>
-          <p>现场证据、固定价格、本地执行，不做长期绑定，只做可交付的结果。</p>
+          <h2>Three Principles We Work By</h2>
+          <p>On-site evidence, fixed pricing, local execution — no long-term lock-in, just deliverable results.</p>
         </div>
         <div className="highlight-grid">
           {content.highlights.map((item, index) => (
@@ -90,8 +90,8 @@ function HomePage({ content, loading }) {
 
       <section className="section cases-section">
         <div className="section-header">
-          <h2>真实案例 | 我们实际走进去的现场</h2>
-          <p>三种典型采购风险，说明为什么你需要专业的中国供应商验证团队。</p>
+          <h2>Real Cases | The Factory Floors We've Actually Walked</h2>
+          <p>Three typical procurement risks that show why you need a professional China supplier verification team.</p>
         </div>
         <div className="case-grid">
           {content.cases.map((item, index) => (
@@ -106,8 +106,8 @@ function HomePage({ content, loading }) {
 
       <section className="section hubs-section">
         <div className="section-header">
-          <h2>本地执行中心</h2>
-          <p>我们在中国采购核心城市长期驻场，真正能做到“拿着合同上门核查”。</p>
+          <h2>Local Execution Centers</h2>
+          <p>We maintain a permanent presence in China's key sourcing hubs — truly capable of "on-site contract verification."</p>
         </div>
         <div className="hub-grid">
           {content.hubs.map((hub, index) => (
@@ -121,8 +121,8 @@ function HomePage({ content, loading }) {
 
       <section className="section plans-section">
         <div className="section-header">
-          <h2>四种入门方式</h2>
-          <p>你可以先用低成本 $95 风险检查，再根据真实结果决定是否升级合同、陪访或问题处理。</p>
+          <h2>Four Ways to Get Started</h2>
+          <p>Start with a low-cost $95 risk check, then decide based on real findings whether to upgrade to contract, visit, or resolution services.</p>
         </div>
         <div className="plan-grid">
           {content.startOptions.map((item, index) => (
@@ -137,8 +137,8 @@ function HomePage({ content, loading }) {
 
       <section className="section brands-section">
         <div className="section-header">
-          <h2>合作方与信任来源</h2>
-          <p>我们服务过多种采购角色和品牌，核心在于结果而不是长期绑定。</p>
+          <h2>Partners &amp; Trust Sources</h2>
+          <p>We've served diverse procurement roles and brands. Our focus is on results, not long-term contracts.</p>
         </div>
         <div className="brand-grid">
           {content.trustLogos.map((name, index) => (
@@ -154,16 +154,16 @@ function HomePage({ content, loading }) {
           <div className="contact-box">
             <h3>{content.contact.title}</h3>
             <p>{content.contact.lead}</p>
-            <p>电话：{content.contact.phone}</p>
-            <p>邮箱：{content.contact.email}</p>
-            <p>地址：{content.contact.address}</p>
+            <p>Phone: {content.contact.phone}</p>
+            <p>Email: {content.contact.email}</p>
+            <p>Address: {content.contact.address}</p>
           </div>
         </div>
         <div className="about-image-wrap">
           {content.about.image ? (
-            <img src={content.about.image} alt="关于我们" />
+            <img src={content.about.image} alt="About Us" />
           ) : (
-            <div className="image-fallback">图片占位</div>
+            <div className="image-fallback">Image Placeholder</div>
           )}
         </div>
       </section>
@@ -173,70 +173,70 @@ function HomePage({ content, loading }) {
           <h2>{content.contact.title}</h2>
           <p>{content.contact.lead}</p>
           <div className="contact-item">
-            <strong>邮箱</strong>
+            <strong>Email</strong>
             <span>{content.contact.email}</span>
           </div>
           <div className="contact-item">
-            <strong>电话</strong>
+            <strong>Phone</strong>
             <span>{content.contact.phone}</span>
           </div>
           <div className="contact-item">
-            <strong>地址</strong>
+            <strong>Address</strong>
             <span>{content.contact.address}</span>
           </div>
         </div>
 
         <form className="contact-form" onSubmit={handleSubmit}>
           <label>
-            姓名
+            Name
             <input
               type="text"
               value={form.name}
               onChange={e => updateForm('name', e.target.value)}
-              placeholder="请输入您的姓名"
+              placeholder="Your full name"
             />
           </label>
           <label>
-            邮箱
+            Email
             <input
               type="email"
               value={form.email}
               onChange={e => updateForm('email', e.target.value)}
-              placeholder="请输入您的邮箱"
+              placeholder="your@email.com"
             />
           </label>
           <label>
-            公司/采购团队
+            Company / Procurement Team
             <input
               type="text"
               value={form.company}
               onChange={e => updateForm('company', e.target.value)}
-              placeholder="例如：XXX 采购部"
+              placeholder="e.g. XYZ Procurement Dept"
             />
           </label>
           <label>
-            咨询内容
+            Your Message
             <textarea
               rows="5"
               value={form.message}
               onChange={e => updateForm('message', e.target.value)}
-              placeholder="请描述您的采购问题或需求"
+              placeholder="Describe your sourcing needs or concerns"
             />
           </label>
           {feedback && <p className="form-message">{feedback}</p>}
           <button className="button button-primary" type="submit">
-            立即发送咨询
+            Send Inquiry
           </button>
-          {submitted && <p className="form-success">已准备好发邮件，请在邮箱中完成发送。</p>}
+          {submitted && <p className="form-success">Email draft ready — please complete sending in your mail client.</p>}
         </form>
       </section>
 
       <section className="section cta-section">
         <div className="cta-panel">
-          <h2>不要让“看起来正常”成为你的采购陷阱</h2>
-          <p>先拿到现场证据，再决定下一步。联系我们，获取第一手风险判断。</p>
+          <h2>Don't Let "Looks Fine" Become Your Procurement Trap</h2>
+          <p>Get on-site evidence first, then decide your next move. Contact us for a first-hand risk assessment.</p>
           <a className="button button-secondary" href={`mailto:${content.contact.email}`}>
-            发送邮件咨询
+            Email Us Now
           </a>
         </div>
       </section>

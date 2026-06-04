@@ -90,7 +90,7 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
       {!authenticated ? (
         <>
           <div className="admin-logo-area">
-            <img src="/logo.png" alt="ChinaBridge Global" className="admin-logo" />
+            <img src="/logo.png" alt="EastLink Solutions" className="admin-logo" />
           </div>
           <form className="admin-login" onSubmit={handleAuthSubmit}>
             <label>

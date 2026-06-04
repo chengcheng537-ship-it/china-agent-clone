@@ -1,4 +1,4 @@
-# ChinaBridge Global
+# EastLink Solutions
 
 基于 React + Vite 的品牌网站，含 Firebase CMS 内容管理后台。面向海外用户的供应商验证与工厂审核服务展示站。
 

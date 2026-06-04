@@ -6,7 +6,7 @@ import AdminPage from './pages/AdminPage';
 
 const defaultContent = {
   hero: {
-    title: 'ChinaBridge Global: China Supplier Verification & Factory Audits',
+    title: 'EastLink Solutions: China Supplier Verification & Factory Audits',
     subtitle: 'The biggest risk when buying from China isn\'t the product — it\'s the supplier you can\'t see. We use on-the-ground evidence to reveal the truth.',
     ctaText: 'Run a $95 Supplier Reality Check',
     ctaLink: '#contact',
@@ -112,12 +112,12 @@ const defaultContent = {
     title: 'Contact Us',
     lead: 'Fill out the form below, or reach us directly by email or phone.',
     phone: '+86 135 2208 6875',
-    email: 'hello@chinabridge-global.com',
+    email: 'hello@eastlink-solutions.com',
     address: 'Guangzhou / Hong Kong'
   },
   seo: {
-    title: 'ChinaBridge Global - Supplier Verification & Factory Audits',
-    description: 'ChinaBridge Global provides professional supplier verification, factory audits, sourcing support & risk control services across China. Guangzhou, Shenzhen, Yiwu teams on the ground.'
+    title: 'EastLink Solutions - Supplier Verification & Factory Audits',
+    description: 'EastLink Solutions provides professional supplier verification, factory audits, sourcing support & risk control services across China. Guangzhou, Shenzhen, Yiwu teams on the ground.'
   },
   branding: {
     favicon: '',
@@ -216,7 +216,7 @@ function App() {
     <div className="app-shell">
       {!isAdmin && (
         <header className="site-header">
-          <div className="brand"><Link to="/"><img src="/logo.png" alt="ChinaBridge Global" className="brand-logo" /></Link></div>
+          <div className="brand"><Link to="/"><img src="/logo.png" alt="EastLink Solutions" className="brand-logo" /></Link></div>
           <nav className="site-nav">
             <a href="#services">Services</a>
             <a href="#about">About</a>
@@ -246,7 +246,7 @@ function App() {
 
       {!isAdmin && (
         <footer className="site-footer">
-          <p>© 2026 ChinaBridge Global. All rights reserved.</p>
+          <p>© 2026 EastLink Solutions. All rights reserved.</p>
         </footer>
       )}
     </div>

@@ -206,6 +206,13 @@ const servicePages = {
         ]
       },
       {
+        title: '',
+        type: 'features',
+        items: [
+          { title: '', desc: '' }
+        ]
+      },
+      {
         title: 'Frequently Asked Questions',
         type: 'faq',
         items: [

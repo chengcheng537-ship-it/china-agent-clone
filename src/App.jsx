@@ -172,16 +172,28 @@ function deepMergeServicePages(defaultPages, remotePages) {
       const ordered = dp.sections.map((ds, dsIdx) => {
         // Empty-title code-default sections are blank templates — use positional
         // matching because title matching fails once admin fills in a real title.
+        // Safety check: only position-match if the remote section at this index
+        // doesn't belong to a DIFFERENT code-default section (by title). This
+        // prevents a blank slot from "stealing" a named section when the remote
+        // array is shorter than the code-default array (e.g. old Firebase data).
         if (!hasText(ds.title)) {
           const positionalRs = remoteSections[dsIdx];
           if (positionalRs && !usedRemoteIndexes.has(dsIdx)) {
-            usedRemoteIndexes.add(dsIdx);
-            return {
-              ...ds,
-              ...positionalRs,
-              items: positionalRs.items ?? ds.items,
-              tiers: positionalRs.tiers ?? ds.tiers,
-            };
+            const rsNormTitle = norm(positionalRs.title);
+            // If the remote section at this slot has a title that matches some
+            // OTHER code-default section (e.g. FAQ got shifted here because the
+            // remote array is shorter), skip positional matching so the real
+            // title-match can claim it.
+            const belongsToOther = hasText(positionalRs.title) && defNormTitles.has(rsNormTitle);
+            if (!belongsToOther) {
+              usedRemoteIndexes.add(dsIdx);
+              return {
+                ...ds,
+                ...positionalRs,
+                items: positionalRs.items ?? ds.items,
+                tiers: positionalRs.tiers ?? ds.tiers,
+              };
+            }
           }
           return ds;
         }

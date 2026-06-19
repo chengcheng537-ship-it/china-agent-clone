@@ -8,6 +8,16 @@ function ServicePage({ content, loading }) {
   const [modalOpen, setModalOpen] = useState(false);
 
   const openModal = (e) => { e.preventDefault(); setModalOpen(true); };
+  const hasText = (value) => typeof value === 'string' && value.trim().length > 0;
+  const itemHasContent = (item) => typeof item === 'string'
+    ? hasText(item)
+    : hasText(item?.title) || hasText(item?.desc) || hasText(item?.q) || hasText(item?.a);
+  const sectionHasContent = (section) => {
+    if (hasText(section.title)) return true;
+    if (section.type === 'pricing') return section.tiers?.some(tier => hasText(tier.name) || hasText(tier.desc) || tier.features?.some(hasText));
+    return section.items?.some(itemHasContent);
+  };
+  const visibleSections = page?.sections?.filter(sectionHasContent) || [];
 
   if (loading) {
     return <div className="loading-panel">Loading...</div>;
@@ -52,7 +62,7 @@ function ServicePage({ content, loading }) {
       </section>
 
       {/* Sections */}
-      {page.sections?.map((section, idx) => (
+      {visibleSections.map((section, idx) => (
         <section className="section service-section" key={idx}>
           <div className="section-header">
             <h2>{section.title}</h2>
@@ -60,7 +70,7 @@ function ServicePage({ content, loading }) {
 
           {section.type === 'features' && (
             <div className="service-features-grid">
-              {section.items?.map((item, i) => (
+              {section.items?.filter(itemHasContent).map((item, i) => (
                 <div className="service-feature-card" key={i}>
                   <h3>{item.title}</h3>
                   <p>{item.desc}</p>
@@ -71,7 +81,7 @@ function ServicePage({ content, loading }) {
 
           {section.type === 'steps' && (
             <div className="service-steps">
-              {section.items?.map((item, i) => (
+              {section.items?.filter(itemHasContent).map((item, i) => (
                 <div className="service-step" key={i}>
                   <div className="step-number">{i + 1}</div>
                   <div className="step-content">
@@ -85,7 +95,7 @@ function ServicePage({ content, loading }) {
 
           {section.type === 'list' && (
             <ul className="service-list">
-              {section.items?.map((item, i) => (
+              {section.items?.filter(itemHasContent).map((item, i) => (
                 <li key={i}>{typeof item === 'string' ? item : item.desc || item.title}</li>
               ))}
             </ul>

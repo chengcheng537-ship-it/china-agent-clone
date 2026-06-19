@@ -351,7 +351,7 @@ button, input, textarea {
 .pricing-features {
   list-style: none;
   padding: 0;
-  margin-top: auto;
+  margin: 0;
   border-top: 1px solid var(--border);
   padding-top: 1rem;
 }

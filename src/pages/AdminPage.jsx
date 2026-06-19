@@ -365,6 +365,14 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
                                 <input style={{ flex: 5 }} placeholder="Description" value={item.desc || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.items.${ii}.desc`, e.target.value)} />
                               </div>
                             ))}
+                            <button
+                              type="button"
+                              className="button-outline"
+                              style={{ marginTop: '0.5rem', fontSize: '0.8rem', padding: '0.35rem 0.85rem' }}
+                              onClick={() => appendArrayItem(`servicePages.${slug}.sections.${si}.items`, { title: '', desc: '' })}
+                            >
+                              ＋ Add Item
+                            </button>
                           </div>
                         )}
 
@@ -375,6 +383,14 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
                             {sec.items.map((item, ii) => (
                               <input key={ii} style={{ marginTop: '0.4rem', width: '100%' }} placeholder={`Item ${ii + 1}`} value={typeof item === 'string' ? item : (item.desc || item.title || '')} onChange={e => updateField(`servicePages.${slug}.sections.${si}.items.${ii}`, e.target.value)} />
                             ))}
+                            <button
+                              type="button"
+                              className="button-outline"
+                              style={{ marginTop: '0.5rem', fontSize: '0.8rem', padding: '0.35rem 0.85rem' }}
+                              onClick={() => appendArrayItem(`servicePages.${slug}.sections.${si}.items`, '')}
+                            >
+                              ＋ Add List Entry
+                            </button>
                           </div>
                         )}
 

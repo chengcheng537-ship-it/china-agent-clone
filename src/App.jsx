@@ -149,8 +149,8 @@ function loadCache() {
 }
 
 // Deep-merge servicePages: remote wins for top-level fields (admin edits persist).
-// Sections maintain code-default order; code-new sections are injected at the
-// correct position.  Stale "$95" values are automatically upgraded to "$99".
+// Sections keep code-default order, but matched remote sections win for type,
+// title and content. Code defaults only fill missing fields and new sections.
 function deepMergeServicePages(defaultPages, remotePages) {
   const result = {};
   for (const slug of Object.keys(defaultPages)) {
@@ -161,19 +161,28 @@ function deepMergeServicePages(defaultPages, remotePages) {
     if (dp.sections) {
       // Normalise whitespace so "\n" vs " " doesn't create duplicate match failures
       const norm = (s) => (s || '').replace(/\s+/g, ' ').trim();
-      const remoteByNorm = {};
-      (rp.sections || []).forEach(s => { remoteByNorm[norm(s.title)] = s; });
+      const remoteSections = rp.sections || [];
+      const usedRemoteIndexes = new Set();
       const defNormTitles = new Set(dp.sections.map(s => norm(s.title)));
-      // Follow code-default order; keep code type/title, pick up remote items
+      // Follow code-default order; matched remote section wins so admin edits
+      // to type/title/items/tiers are not overwritten by code defaults.
       const ordered = dp.sections.map(ds => {
-        const rs = remoteByNorm[norm(ds.title)];
-        if (!rs) return ds;
-        const contentKey = ds.type === 'pricing' ? 'tiers' : 'items';
-        return { ...ds, [contentKey]: rs[contentKey] || ds[contentKey] };
+        const remoteIndex = remoteSections.findIndex((rs, idx) => (
+          !usedRemoteIndexes.has(idx) && norm(rs.title) === norm(ds.title)
+        ));
+        if (remoteIndex === -1) return ds;
+        usedRemoteIndexes.add(remoteIndex);
+        const rs = remoteSections[remoteIndex];
+        return {
+          ...ds,
+          ...rs,
+          items: rs.items ?? ds.items,
+          tiers: rs.tiers ?? ds.tiers,
+        };
       });
       // Append any remote sections that are NOT in code defaults
-      (rp.sections || []).forEach(rs => {
-        if (!defNormTitles.has(norm(rs.title))) ordered.push(rs);
+      remoteSections.forEach((rs, idx) => {
+        if (!usedRemoteIndexes.has(idx) && !defNormTitles.has(norm(rs.title))) ordered.push(rs);
       });
       merged.sections = ordered;
     }

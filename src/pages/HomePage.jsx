@@ -50,9 +50,6 @@ function HomePage({ content, loading }) {
             <a className="button button-primary" href={content.hero.ctaLink || '#contact'}>
               {content.hero.ctaText}
             </a>
-            <a className="button button-secondary" href={`mailto:${content.contact.email}`}>
-              Email Us Directly
-            </a>
           </div>
         </div>
       </section>

@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { saveSiteContent, fileToBase64, initFirebase } from './firebase';
 import HomePage from './pages/HomePage';
+import ServicePage from './pages/ServicePage';
 import AdminPage from './pages/AdminPage';
+import serviceContent from './data/serviceContent';
 
 const defaultContent = {
+  servicePages: serviceContent,
   hero: {
     title: 'EastLink Solutions: China Supplier Verification & Factory Audits',
     subtitle: 'The biggest risk when buying from China isn\'t the product — it\'s the supplier you can\'t see. We use on-the-ground evidence to reveal the truth.',
@@ -227,12 +230,31 @@ function App() {
     }
   }
 
+  function setNested(obj, path, value) {
+    const keys = path.split('.');
+    const result = Array.isArray(obj) ? [...obj] : { ...obj };
+    let pointer = result;
+    keys.forEach((k, i) => {
+      if (i === keys.length - 1) {
+        pointer[k] = value;
+      } else {
+        const next = pointer[k];
+        pointer[k] = Array.isArray(next) ? [...next] : { ...next };
+        pointer = pointer[k];
+      }
+    });
+    return result;
+  }
+
   async function handleUpload(field, file) {
     setLoading(true);
     try {
       const base64 = await fileToBase64(file);
       let updated;
-      if (field === 'favicon' || field === 'logo') {
+      if (field.includes('.')) {
+        // Nested path like servicePages.reality-check.image.src
+        updated = setNested(content, field, base64);
+      } else if (field === 'favicon' || field === 'logo') {
         updated = { ...content, branding: { ...content.branding, [field]: base64 } };
       } else {
         updated = { ...content, [field]: { ...content[field], image: base64 } };
@@ -253,10 +275,25 @@ function App() {
       {!isAdmin && (
         <header className="site-header">
           <div className="brand"><Link to="/"><img src="/logo.png" alt="EastLink Solutions" className="brand-logo" /></Link></div>
+          <button className="nav-toggle" aria-label="Toggle menu" onClick={() => document.querySelector('.site-nav').classList.toggle('nav-open')}>
+            <span></span><span></span><span></span>
+          </button>
           <nav className="site-nav">
-            <a href="#services">Services</a>
-            <a href="#about">About</a>
-            <a href="#contact">Contact</a>
+            <Link to="/">Home</Link>
+            <Link to="/#about">About Us</Link>
+            <div className="nav-dropdown">
+              <button className="nav-dropdown-toggle" onClick={(e) => {
+                e.currentTarget.parentElement.classList.toggle('open');
+              }}>Services <span className="arrow">▾</span></button>
+              <div className="nav-dropdown-menu">
+                <Link to="/services/reality-check">Supplier Reality Check™ — $95</Link>
+                <Link to="/services/due-diligence">Due Diligence</Link>
+                <Link to="/services/contracts">Contracts</Link>
+                <Link to="/services/guided-visits">Guided Visits</Link>
+                <Link to="/services/fixer">Fixer</Link>
+              </div>
+            </div>
+            <Link to="/#contact">Contact Us</Link>
           </nav>
         </header>
       )}
@@ -264,6 +301,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<HomePage content={content} loading={loading} />} />
+          <Route path="/services/:slug" element={<ServicePage content={content} loading={loading} />} />
           <Route
             path="/admin"
             element={

@@ -4,6 +4,11 @@ import react from '@vitejs/plugin-react';
 const BUILD_ID = Date.now().toString(36);
 
 export default defineConfig({
+  server: {
+    proxy: {
+      '/api': 'https://eastlink-solutions.com'
+    }
+  },
   plugins: [
     react(),
     {

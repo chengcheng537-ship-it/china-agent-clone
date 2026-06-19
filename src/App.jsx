@@ -148,16 +148,16 @@ function loadCache() {
   }
 }
 
-// Deep-merge servicePages: code defaults take priority for top-level fields
-// (so $95→$99, banner→list, new FAQ sections survive).
-// Sections: remote order kept; code-new sections appended at end.
+// Deep-merge servicePages: remote wins for top-level fields (admin edits persist).
+// Sections maintain code-default order; code-new sections are injected at the
+// correct position.  Stale "$95" values are automatically upgraded to "$99".
 function deepMergeServicePages(defaultPages, remotePages) {
   const result = {};
   for (const slug of Object.keys(defaultPages)) {
     const dp = defaultPages[slug];
     const rp = remotePages[slug] || {};
-    // Code defaults win for top-level fields — admin re-saves after customization
-    const merged = { ...rp, ...dp };
+    // Remote wins for top-level → admin edits survive across reloads
+    const merged = { ...dp, ...rp };
     if (dp.sections) {
       const remoteByTitle = {};
       (rp.sections || []).forEach(s => { remoteByTitle[s.title] = s; });
@@ -170,6 +170,8 @@ function deepMergeServicePages(defaultPages, remotePages) {
       });
       merged.sections = ordered;
     }
+    // Fixup: stale $95 → $99 in all text fields
+    sanitizeDollarValues(merged);
     result[slug] = merged;
   }
   // Also preserve any pages only in remote
@@ -177,6 +179,21 @@ function deepMergeServicePages(defaultPages, remotePages) {
     if (!result[slug]) result[slug] = remotePages[slug];
   }
   return result;
+}
+
+// Recursively replace "$95" with "$99" so nav dropdown and hero badge stay current.
+function sanitizeDollarValues(obj) {
+  if (!obj || typeof obj !== 'object') return;
+  for (const key of Object.keys(obj)) {
+    const val = obj[key];
+    if (typeof val === 'string' && val.includes('$95')) {
+      obj[key] = val.replace(/\$95/g, '$99');
+    } else if (Array.isArray(val)) {
+      val.forEach(item => sanitizeDollarValues(item));
+    } else if (val && typeof val === 'object') {
+      sanitizeDollarValues(val);
+    }
+  }
 }
 
 function saveCache(data) {

@@ -300,6 +300,7 @@ function App() {
     } catch (error) {
       console.error(error);
       alert('Save failed. Please check Firebase configuration.');
+      throw error;
     } finally {
       setLoading(false);
     }

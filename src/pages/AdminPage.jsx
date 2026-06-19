@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getInquiries } from '../firebase';
 
 const ADMIN_PASSWORD = 'cb2026';
@@ -7,12 +7,14 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
   const [authValue, setAuthValue] = useState('');
   const [authenticated, setAuthenticated] = useState(false);
   const [draft, setDraft] = useState(content);
+  const draftRef = useRef(content);
   const [saveStatus, setSaveStatus] = useState('');
   const [inquiries, setInquiries] = useState([]);
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
 
   useEffect(() => {
     setDraft(content);
+    draftRef.current = content;
   }, [content]);
 
   useEffect(() => {
@@ -60,6 +62,7 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
         }
       });
 
+      draftRef.current = next;
       return next;
     });
   }
@@ -81,15 +84,16 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
           pointer = cloned;
         }
       });
+      draftRef.current = next;
       return next;
     });
   }
 
-  function handleSaveClick() {
+  async function handleSaveClick() {
     setSaveStatus('saving');
     try {
-      onSave(draft);
-      setTimeout(() => setSaveStatus('done'), 800);
+      await onSave(draftRef.current);
+      setSaveStatus('done');
       setTimeout(() => setSaveStatus(''), 3000);
     } catch (err) {
       setSaveStatus('error');

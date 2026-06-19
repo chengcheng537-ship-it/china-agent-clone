@@ -65,10 +65,29 @@ export async function fetchSiteContent() {
   return snapshot.data();
 }
 
+function sanitizeForFirestore(value) {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (Array.isArray(value)) {
+    return value.map(item => item === undefined ? null : sanitizeForFirestore(item));
+  }
+  if (typeof value === 'object') {
+    const cleaned = {};
+    Object.entries(value).forEach(([key, item]) => {
+      const cleanedValue = sanitizeForFirestore(item);
+      if (cleanedValue !== undefined) {
+        cleaned[key] = cleanedValue;
+      }
+    });
+    return cleaned;
+  }
+  return value;
+}
+
 export async function saveSiteContent(data) {
   const { db } = initFirebase();
   const docRef = doc(db, 'site', 'content');
-  await setDoc(docRef, data, { merge: true });
+  await setDoc(docRef, sanitizeForFirestore(data), { merge: true });
 }
 
 export async function fileToBase64(file, maxWidth = 1200, quality = 0.75) {

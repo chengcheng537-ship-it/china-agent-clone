@@ -136,25 +136,19 @@ function App() {
   useEffect(() => {
     let active = true;
 
-    async function loadContent() {
-      // 超时保护：Firebase 连接超过 3 秒则直接用本地默认内容
-      const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Firebase timeout')), 3000)
-      );
+    // 页面秒开：先从本地默认内容展示，Firebase 后台静默同步
+    setLoading(false);
 
+    async function loadContent() {
       try {
         initFirebase();
         setFirebaseReady(true);
-        const remote = await Promise.race([fetchSiteContent(), timeout]);
+        const remote = await fetchSiteContent();
         if (remote && active) {
           setContent({ ...defaultContent, ...remote });
         }
       } catch (error) {
         console.warn('Firebase not configured or failed to load, using local defaults.', error.message);
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
       }
     }
 

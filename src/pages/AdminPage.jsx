@@ -258,6 +258,120 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
                 <label>Content<textarea rows="4" value={draft.about?.content || ''} onChange={e => updateField('about.content', e.target.value)} /></label>
               </div>
 
+              {/* ========== Service Pages ========== */}
+              <div className="form-group">
+                <h2>Service Pages (Secondary Pages)</h2>
+                <p className="upload-hint">Edit all content for each service sub-page. Images show placeholder with size requirement until uploaded.</p>
+                {draft.servicePages && Object.entries(draft.servicePages).map(([slug, page]) => (
+                  <div key={slug} className="array-group" style={{ borderLeft: '3px solid var(--primary)', paddingLeft: '1rem', marginBottom: '2rem' }}>
+                    <h3>{page.title || slug} <span style={{ color: 'var(--muted)', fontWeight: 400, fontSize: '0.85rem' }}>/services/{slug}</span></h3>
+                    
+                    {/* ── Top-level fields ── */}
+                    <div className="form-grid">
+                      <label>Nav Label<input value={page.navLabel || ''} onChange={e => updateField(`servicePages.${slug}.navLabel`, e.target.value)} /></label>
+                      <label>Badge (price/timeline)<input value={page.badge || ''} onChange={e => updateField(`servicePages.${slug}.badge`, e.target.value)} /></label>
+                    </div>
+                    <label>Hero Title<input value={page.heroTitle || ''} onChange={e => updateField(`servicePages.${slug}.heroTitle`, e.target.value)} /></label>
+                    <label>Hero Description<textarea rows="2" value={page.heroDescription || ''} onChange={e => updateField(`servicePages.${slug}.heroDescription`, e.target.value)} /></label>
+                    
+                    {/* Image upload with size spec */}
+                    <div className="upload-card">
+                      <p><strong>Hero Image</strong> <span className="upload-hint">({page.image?.label || `Recommended ${page.image?.width || 800}×${page.image?.height || 400}px`})</span></p>
+                      {page.image?.src ? (
+                        <div className="upload-preview">
+                          <img src={page.image.src} alt={page.title} className="upload-thumb" />
+                          <p className="upload-hint" style={{ marginTop: '0.25rem' }}>Re-upload to replace</p>
+                        </div>
+                      ) : (
+                        <p className="upload-hint">No image uploaded — placeholder will show size spec</p>
+                      )}
+                      <input type="file" accept="image/*" onChange={e => { const f = e.target.files[0]; if (f) onUpload(`servicePages.${slug}.image.src`, f); }} style={{ marginTop: '0.5rem' }} />
+                    </div>
+                    <div className="form-grid">
+                      <label>CTA Text<input value={page.ctaText || ''} onChange={e => updateField(`servicePages.${slug}.ctaText`, e.target.value)} /></label>
+                      <label>CTA Link<input value={page.ctaLink || ''} onChange={e => updateField(`servicePages.${slug}.ctaLink`, e.target.value)} /></label>
+                    </div>
+
+                    {/* ── Sections (features / steps / list / pricing / faq) ── */}
+                    {page.sections && page.sections.map((sec, si) => (
+                      <div key={si} style={{ border: '1px solid var(--border)', borderRadius: 8, padding: '1rem', margin: '1rem 0', background: '#fafafa' }}>
+                        <div className="form-grid">
+                          <label>Section Title<input value={sec.title || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.title`, e.target.value)} /></label>
+                          <label>Type
+                            <select value={sec.type || 'features'} onChange={e => updateField(`servicePages.${slug}.sections.${si}.type`, e.target.value)}>
+                              <option value="features">Features Grid</option>
+                              <option value="steps">Steps</option>
+                              <option value="list">List</option>
+                              <option value="pricing">Pricing Tiers</option>
+                              <option value="faq">FAQ</option>
+                            </select>
+                          </label>
+                        </div>
+
+                        {/* Features / Steps items */}
+                        {(sec.type === 'features' || sec.type === 'steps') && sec.items && (
+                          <div style={{ marginTop: '0.75rem' }}>
+                            <p className="upload-hint" style={{ marginBottom: 0 }}>Items:</p>
+                            {sec.items.map((item, ii) => (
+                              <div key={ii} style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
+                                <input style={{ flex: 3 }} placeholder="Title" value={item.title || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.items.${ii}.title`, e.target.value)} />
+                                <input style={{ flex: 5 }} placeholder="Description" value={item.desc || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.items.${ii}.desc`, e.target.value)} />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* List items */}
+                        {sec.type === 'list' && sec.items && (
+                          <div style={{ marginTop: '0.75rem' }}>
+                            <p className="upload-hint" style={{ marginBottom: 0 }}>List entries:</p>
+                            {sec.items.map((item, ii) => (
+                              <input key={ii} style={{ marginTop: '0.4rem', width: '100%' }} placeholder={`Item ${ii + 1}`} value={typeof item === 'string' ? item : (item.desc || item.title || '')} onChange={e => updateField(`servicePages.${slug}.sections.${si}.items.${ii}`, e.target.value)} />
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Pricing tiers */}
+                        {sec.type === 'pricing' && sec.tiers && (
+                          <div style={{ marginTop: '0.75rem' }}>
+                            <p className="upload-hint" style={{ marginBottom: 0 }}>Tiers:</p>
+                            {sec.tiers.map((tier, ti) => (
+                              <div key={ti} style={{ border: '1px dashed var(--border)', borderRadius: 6, padding: '0.75rem', marginTop: '0.5rem' }}>
+                                <div className="form-grid">
+                                  <label>Tier Name<input value={tier.name || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.name`, e.target.value)} /></label>
+                                </div>
+                                <label>Description<textarea rows="2" value={tier.desc || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.desc`, e.target.value)} /></label>
+                                {tier.features && (
+                                  <div style={{ marginTop: '0.5rem' }}>
+                                    <p className="upload-hint" style={{ marginBottom: 0 }}>Features:</p>
+                                    {tier.features.map((f, fi) => (
+                                      <input key={fi} style={{ marginTop: '0.3rem', width: '100%' }} placeholder={`Feature ${fi + 1}`} value={f || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.features.${fi}`, e.target.value)} />
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* FAQ items */}
+                        {sec.type === 'faq' && sec.items && (
+                          <div style={{ marginTop: '0.75rem' }}>
+                            <p className="upload-hint" style={{ marginBottom: 0 }}>Q&amp;A pairs:</p>
+                            {sec.items.map((item, qi) => (
+                              <div key={qi} style={{ marginTop: '0.4rem' }}>
+                                <input style={{ width: '100%', marginBottom: '0.25rem' }} placeholder={`Question ${qi + 1}`} value={item.q || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.items.${qi}.q`, e.target.value)} />
+                                <textarea rows="2" style={{ width: '100%' }} placeholder={`Answer ${qi + 1}`} value={item.a || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.items.${qi}.a`, e.target.value)} />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
               {/* ========== Contact ========== */}
               <div className="form-group">
                 <h2>Contact Info</h2>

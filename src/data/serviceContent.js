@@ -85,6 +85,26 @@ const servicePages = {
         ]
       },
       {
+        title: 'What we actually verify',
+        type: 'features',
+        items: [
+          { title: 'On paper', desc: 'Business license, legal person, ownership, registered vs. mailing address, business scope, and active lawsuits — pulled from Chinese government registries and translated into English.' },
+          { title: 'In the bank', desc: 'Account name, bank name, and country — cross-checked against the entity. Mismatched HK, BVI, or Samoa accounts get flagged. This is where most fraud lives.' },
+          { title: 'On the ground', desc: 'A China Agent inspector walks the factory, photographs the production line, geo-tags the location, and signs a report. Real building, real workers, real machines, real proof.' },
+          { title: 'In legal terms', desc: 'For high-stakes deals: full legal verification. We pull court records, cross-reference the legal person\'s other companies, and write a commercial interpretation a lawyer can defend.' }
+        ]
+      },
+      {
+        title: 'What this isn\'t',
+        type: 'features',
+        items: [
+          { title: 'Not a database lookup', desc: 'Anyone can pull a Chinese business license screenshot. We translate, interpret, cross-check, and sign. The verdict is what you\'re paying for — not the data.' },
+          { title: 'Not a generic credit report', desc: 'Dun & Bradstreet won\'t tell you the registered address is an empty noodle shop. They won\'t visit. They won\'t sign. They won\'t catch the trading company pretending to be a factory. We will.' },
+          { title: 'Not a sales call', desc: 'We don\'t run discovery calls disguised as research. You pay. We deliver a written file. The verdict is in your inbox in 2 business days.' },
+          { title: 'Not a sourcing recommendation', desc: 'We don\'t take a cent from any factory. Our verdict serves one side: yours. We never tell you who to use — only what\'s true about who you\'re already considering.' }
+        ]
+      },
+      {
         title: 'Frequently Asked Questions',
         type: 'faq',
         items: [

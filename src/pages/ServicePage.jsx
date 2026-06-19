@@ -92,7 +92,7 @@ function ServicePage({ content, loading }) {
           )}
 
           {section.type === 'pricing' && (
-            <div className="service-pricing-grid">
+            <div className={`service-pricing-grid ${section.tiers?.length === 3 ? 'service-pricing-grid-three' : ''}`}>
               {section.tiers?.map((tier, i) => (
                 <div className="service-pricing-card" key={i}>
                   <h3>{tier.name}</h3>

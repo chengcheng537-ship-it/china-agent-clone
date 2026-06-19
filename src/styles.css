@@ -324,6 +324,10 @@ button, input, textarea {
   .service-pricing-grid {
     grid-template-columns: repeat(4, 1fr);
   }
+  .service-pricing-grid-three {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 900px;
+  }
 }
 .service-pricing-card {
   background: white;

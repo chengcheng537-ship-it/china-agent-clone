@@ -149,12 +149,16 @@ function loadCache() {
 }
 
 // Deep-merge servicePages: remote wins for top-level fields (admin edits persist).
-// Sections use position-based (index) matching so admin can safely edit ANY field
-// — including title — without creating duplicates or breaking section order.
-// Extra remote sections beyond code-default length are appended; missing remote
-// sections fall back to code defaults.
+// Named sections use position-based (index) matching so admin can safely edit
+// ANY field — including title — without creating duplicates.
+// Blank (empty-title) sections use position matching with a safety check: if the
+// remote section at the same index appears to belong to a different code-default
+// section (e.g. FAQ got shifted because the remote array is shorter), skip the
+// merge to avoid duplicates. Extra remote sections are appended at the end.
 function deepMergeServicePages(defaultPages, remotePages) {
   const result = {};
+  const norm = (s) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
+  const hasText = (v) => typeof v === 'string' && v.trim().length > 0;
   for (const slug of Object.keys(defaultPages)) {
     const dp = defaultPages[slug];
     const rp = remotePages[slug] || {};
@@ -162,21 +166,28 @@ function deepMergeServicePages(defaultPages, remotePages) {
     const merged = { ...dp, ...rp };
     if (dp.sections) {
       const remoteSections = rp.sections || [];
-      // Position-based merge: section at index N in code defaults maps to
-      // section at index N in remote. Admin can rename, retype, or rewrite
-      // anything without breaking the mapping.
       const ordered = dp.sections.map((ds, idx) => {
         const rs = remoteSections[idx];
         if (!rs) return ds;
-        return {
-          ...ds,
-          ...rs,
-          items: rs.items ?? ds.items,
-          tiers: rs.tiers ?? ds.tiers,
-        };
+        // Named sections: pure positional merge — admin can rename freely
+        if (hasText(ds.title)) {
+          return { ...ds, ...rs, items: rs.items ?? ds.items, tiers: rs.tiers ?? ds.tiers };
+        }
+        // Blank template: safety-check that remote section at this position
+        // doesn't "belong" to a different code-default section by title.
+        // This handles the transitional state when code has more sections
+        // than Firebase (e.g. a new blank section was just added to code).
+        if (hasText(rs.title)) {
+          const rsNorm = norm(rs.title);
+          const belongsToOther = dp.sections.some(
+            (otherDs, otherIdx) => otherIdx !== idx && hasText(otherDs.title) && norm(otherDs.title) === rsNorm
+          );
+          if (belongsToOther) return ds; // skip — this remote section belongs elsewhere
+        }
+        // Safe to merge: both blank, or remote has a unique new title
+        return { ...ds, ...rs, items: rs.items ?? ds.items, tiers: rs.tiers ?? ds.tiers };
       });
-      // Append any remote sections beyond code-default length (new sections
-      // added by admin will appear after all code-default sections).
+      // Append any remote sections beyond code-default length
       for (let i = dp.sections.length; i < remoteSections.length; i++) {
         ordered.push(remoteSections[i]);
       }

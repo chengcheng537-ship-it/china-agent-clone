@@ -384,14 +384,20 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
                                   <label>Tier Name<input value={tier.name || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.name`, e.target.value)} /></label>
                                 </div>
                                 <label>Description<textarea rows="2" value={tier.desc || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.desc`, e.target.value)} /></label>
-                                {tier.features && (
-                                  <div style={{ marginTop: '0.5rem' }}>
-                                    <p className="upload-hint" style={{ marginBottom: 0 }}>Features:</p>
-                                    {tier.features.map((f, fi) => (
-                                      <input key={fi} style={{ marginTop: '0.3rem', width: '100%' }} placeholder={`Feature ${fi + 1}`} value={f || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.features.${fi}`, e.target.value)} />
-                                    ))}
-                                  </div>
-                                )}
+                                <div style={{ marginTop: '0.5rem' }}>
+                                  <p className="upload-hint" style={{ marginBottom: 0 }}>Features:</p>
+                                  {(tier.features || []).map((f, fi) => (
+                                    <input key={fi} style={{ marginTop: '0.3rem', width: '100%' }} placeholder={`Feature ${fi + 1}`} value={f || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.features.${fi}`, e.target.value)} />
+                                  ))}
+                                  <button
+                                    type="button"
+                                    className="button-outline"
+                                    style={{ marginTop: '0.5rem', fontSize: '0.8rem', padding: '0.35rem 0.85rem' }}
+                                    onClick={() => appendArrayItem(`servicePages.${slug}.sections.${si}.tiers.${ti}.features`, '')}
+                                  >
+                                    ＋ Add Feature
+                                  </button>
+                                </div>
                               </div>
                             ))}
                           </div>

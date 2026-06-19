@@ -135,7 +135,7 @@ const servicePages = {
     sections: [
       {
         title: 'How it works',
-        type: 'features',
+        type: 'steps',
         items: [
           { title: 'Pre-trip due diligence', desc: 'We run due diligence on every supplier on your list. Confirm decision-makers will be in the room — not just sales staff.' },
           { title: 'Logistics & coordination', desc: 'Driver and translator booked, vetted, and on call. Daily oversight. Daily summary. The schedule is yours, the logistics are us.' },

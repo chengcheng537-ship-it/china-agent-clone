@@ -223,10 +223,15 @@ button, input, textarea {
 /* Features grid */
 .service-features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1.5rem;
   max-width: 1000px;
   margin: 0 auto;
+}
+@media (min-width: 769px) {
+  .service-features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 .service-feature-card {
   background: white;
@@ -304,10 +309,20 @@ button, input, textarea {
 /* Pricing cards */
 .service-pricing-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.5rem;
-  max-width: 1100px;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  max-width: 1200px;
   margin: 0 auto;
+}
+@media (min-width: 769px) {
+  .service-pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1025px) {
+  .service-pricing-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 .service-pricing-card {
   background: white;

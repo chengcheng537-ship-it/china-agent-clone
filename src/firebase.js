@@ -15,9 +15,9 @@ import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
  */
 const firebaseConfig = {
   apiKey: 'AIzaSyDc09ZgiLyPo2fLsOVPin83e0dFbzq_VFA',
-  authDomain: 'eastlink-solutions.firebaseapp.com',
-  projectId: 'eastlink-solutions',
-  storageBucket: 'eastlink-solutions.firebasestorage.app',
+  authDomain: 'chinabridge-global.firebaseapp.com',
+  projectId: 'chinabridge-global',
+  storageBucket: 'chinabridge-global.firebasestorage.app',
   messagingSenderId: '39497963994',
   appId: '1:39497963994:web:7061ad80072a0317ec48e3'
 };

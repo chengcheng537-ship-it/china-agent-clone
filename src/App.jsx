@@ -137,10 +137,15 @@ function App() {
     let active = true;
 
     async function loadContent() {
+      // 超时保护：Firebase 连接超过 3 秒则直接用本地默认内容
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Firebase timeout')), 3000)
+      );
+
       try {
         initFirebase();
         setFirebaseReady(true);
-        const remote = await fetchSiteContent();
+        const remote = await Promise.race([fetchSiteContent(), timeout]);
         if (remote && active) {
           setContent({ ...defaultContent, ...remote });
         }

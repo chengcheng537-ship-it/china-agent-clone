@@ -179,6 +179,10 @@ function deepMergeServicePages(defaultPages, remotePages) {
     }
     // Fixup: stale $95 → $99 in all text fields
     sanitizeDollarValues(merged);
+    // Strip " — $xx" price from reality-check navLabel
+    if (slug === 'reality-check' && merged.navLabel) {
+      merged.navLabel = merged.navLabel.replace(/ — \$\d+/, '');
+    }
     result[slug] = merged;
   }
   // Also preserve any pages only in remote

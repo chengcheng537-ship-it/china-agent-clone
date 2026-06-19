@@ -2,7 +2,7 @@
 const servicePages = {
   'reality-check': {
     slug: 'reality-check',
-    navLabel: 'Supplier Reality Check™ — $99',
+    navLabel: 'Supplier Reality Check™',
     title: 'Supplier Reality Check',
     badge: '$99 · 2 business days · One supplier per check',
     heroTitle: 'Find out who you\'re really paying — before you wire a cent.',

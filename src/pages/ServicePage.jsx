@@ -119,6 +119,15 @@ function ServicePage({ content, loading }) {
               ))}
             </div>
           )}
+
+          {section.type === 'banner' && (
+            <div className="service-banner">
+              <h3 className="banner-title">{section.title}</h3>
+              {section.items?.map((line, i) => (
+                <p key={i} className={line.hi ? 'banner-hi' : ''}>{line.desc}</p>
+              ))}
+            </div>
+          )}
         </section>
       ))}
 

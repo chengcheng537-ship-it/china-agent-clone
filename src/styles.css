@@ -378,6 +378,34 @@ button, input, textarea {
   padding: 0.5rem 0 0.75rem;
 }
 
+/* Banner */
+.service-banner {
+  max-width: 700px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border-radius: 14px;
+  padding: 2rem 2rem 1.75rem;
+  text-align: center;
+}
+.banner-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  line-height: 1.45;
+}
+.service-banner p {
+  margin: 0.35rem 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  opacity: 0.88;
+}
+.banner-hi {
+  font-weight: 600;
+  opacity: 1 !important;
+  font-size: 1rem !important;
+}
+
 /* CTA section */
 .service-cta {
   text-align: center;

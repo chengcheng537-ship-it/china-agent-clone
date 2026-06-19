@@ -2,9 +2,9 @@
 const servicePages = {
   'reality-check': {
     slug: 'reality-check',
-    navLabel: 'Supplier Reality Check™ — $95',
+    navLabel: 'Supplier Reality Check™ — $99',
     title: 'Supplier Reality Check',
-    badge: '$95 · 2 business days · One supplier per check',
+    badge: '$99 · 2 business days · One supplier per check',
     heroTitle: 'Find out who you\'re really paying — before you wire a cent.',
     heroDescription: 'A 1–2 page written verdict on any Chinese supplier. License, ownership, registered address, lawsuits, business scope, and bank cross-check — delivered in 2 business days. No screenshots. No spreadsheet dumps. A real report, signed by our China Hub Manager.',
     image: { src: '', width: 800, height: 400, label: 'Hero image (800×400 recommended)' },
@@ -43,17 +43,26 @@ const servicePages = {
         ]
       },
       {
+        title: 'You\'re not paying for a report. You\'re pre-paying for proof.',
+        type: 'banner',
+        items: [
+          { title: '', desc: 'The $99 isn\'t a fee. It\'s a deposit on your next move.', hi: false },
+          { title: '', desc: 'Upgrade to any verification, visit, or contract service within 30 days, and the $99 comes off the price.', hi: false },
+          { title: '', desc: 'No extra cost for the truth. You only spend more if it\'s worth acting on.', hi: true }
+        ]
+      },
+      {
         title: 'Frequently Asked Questions',
         type: 'faq',
         items: [
           { q: 'How fast is delivery?', a: 'Two business days from the moment you submit company name, address, and bank details.' },
-          { q: 'What if you find nothing?', a: 'You\'ll know in your verdict. We\'ve caught shell offices, dissolved entities, and cloned licenses. The $95 covers the search either way.' },
+          { q: 'What if you find nothing?', a: 'You\'ll know in your verdict. We\'ve caught shell offices, dissolved entities, and cloned licenses. The $99 covers the search either way.' },,
           { q: 'Does the supplier know?', a: 'No. Reality Checks are silent. The supplier doesn\'t know they\'re being verified.' },
           { q: 'What language is the report in?', a: 'English. Source data is Chinese. We translate every relevant line and include the original where it matters.' }
         ]
       }
     ],
-    ctaText: 'Run a $95 Supplier Reality Check',
+    ctaText: 'Run a $99 Supplier Reality Check',
     ctaLink: '#contact'
   },
 
@@ -118,6 +127,16 @@ const servicePages = {
           { name: 'MASTER Contract — $1,995', desc: 'The standalone master contract. Signed once. Every future PO references it. Persists across multiple orders.', features: ['Standalone bilingual master contract', 'Signed and chopped separately', 'Persists across multiple POs', 'We coordinate chop with supplier'] },
           { name: 'Manufacturing Agreement — $2,650', desc: 'MASTER Contract + manufacturing-specific terms: line allocation, mold ownership, raw material traceability, confidentiality.', features: ['Everything in MASTER Contract', 'Manufacturing-specific terms', 'Raw material sourcing + traceability', 'Reviewed by senior legal partner'] }
         ]
+      },
+      {
+        title: 'Frequently Asked Questions',
+        type: 'faq',
+        items: [
+          { q: 'Why can\'t I just use my own contract?', a: 'Most Western contracts aren\'t recognized by Chinese courts. Language, jurisdiction, and chop requirements are different. We draft contracts that Chinese courts will actually enforce.' },
+          { q: 'What\'s a company chop and why does it matter?', a: 'A chop is the company\'s registered seal. Without the correct chop, a contract has no legal weight in China. We verify every chop against the registered entity.' },
+          { q: 'How fast can I get a contract?', a: 'Pre-Wire Review: 2 business days. PO/PI Contract: 3–4 business days. MASTER Contract: 5–7 business days. Manufacturing Agreement: 7–10 business days.' },
+          { q: 'Do you handle contract disputes?', a: 'Yes. If a dispute arises under a contract we drafted, our Fixer service can step in with on-site intervention, negotiation, and legal coordination.' }
+        ]
       }
     ],
     ctaText: 'Get Contract Protection',
@@ -151,6 +170,16 @@ const servicePages = {
           { name: '5-Day Visit — $4,950', desc: 'Single hub or two close hubs. 3–5 factories. The standard buyer trip.', features: ['Multi-factory schedule with travel logistics', 'Mid-trip schedule adjustment', 'Driver + translator included'] },
           { name: '7-Day Visit — $6,950', desc: '3–4 hubs across multiple regions. Up to 6 factories total. For buyers covering multiple production zones.', features: ['Multi-region logistics', 'Optional market visits and Canton Fair days', 'Driver + translator included'] }
         ]
+      },
+      {
+        title: 'Frequently Asked Questions',
+        type: 'faq',
+        items: [
+          { q: 'Do I need to speak Chinese?', a: 'No. A Mandarin-English translator is included in every visit. We handle all factory-floor conversations and meeting notes in English.' },
+          { q: 'Can I visit multiple cities in one trip?', a: 'Yes. The 7-Day Visit covers 3–4 hubs across multiple regions. We arrange domestic flights, trains, and drivers between cities.' },
+          { q: 'What if I need to change the schedule mid-trip?', a: 'The 5-Day and 7-Day tiers include mid-trip schedule adjustment. We handle rebooking and supplier communication at no extra cost.' },
+          { q: 'Is the translator industry-savvy?', a: 'Yes. Our translators have experience in manufacturing, QC, and procurement. They translate technical terms, not just words.' }
+        ]
       }
     ],
     ctaText: 'Plan a Guided Visit',
@@ -183,6 +212,16 @@ const servicePages = {
           { name: 'Quick Dispute Review — $795', desc: 'Diagnostic-only. You send documents. We write back with assessment: what happened, what\'s recoverable, your real options. 2–3 business days.', features: ['Full document review', 'Written diagnostic', 'Recovery probability assessment', 'No supplier contact'] },
           { name: 'Tier 2 Negotiation — from $1,950', desc: 'Active intervention. Direct negotiation with factory owner. Chinese-language pressure correspondence. Documented agreement.', features: ['Direct negotiation with factory owner', 'Chinese-language correspondence', 'Documented agreement (English + Chinese, chopped)', 'On-site presence as needed'] },
           { name: 'Full Fixer — Custom Quote', desc: 'Sustained intervention until the matter is closed. Best for high-stakes disputes or cases needing a permanent China-side representative.', features: ['Sustained on-site presence (up to 30 days)', 'Coordinated legal escalation if required', 'Recovery execution', 'Final close-out report'] }
+        ]
+      },
+      {
+        title: 'Frequently Asked Questions',
+        type: 'faq',
+        items: [
+          { q: 'How fast can you intervene?', a: 'Quick Dispute Review: 2–3 business days. Tier 2 Negotiation: we can be on-site within 5 business days. Full Fixer: lead time varies by scope — we\'ll confirm during intake.' },
+          { q: 'What\'s the success rate?', a: 'We don\'t promise outcomes — we promise presence. Some disputes recover 100%. Some recover 30%. Some recover zero. We tell you the truth immediately so you can make real decisions.' },
+          { q: 'Will the supplier know I hired you?', a: 'For Tier 2 and Full Fixer: yes. Direct negotiation requires disclosure. For Quick Dispute Review: the supplier is not contacted.' },
+          { q: 'What if legal action is needed?', a: 'The Full Fixer tier includes coordinated legal escalation. We work with Chinese law firms we\'ve vetted over years of joint cases.' }
         ]
       }
     ],

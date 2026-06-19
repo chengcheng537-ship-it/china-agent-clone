@@ -64,6 +64,27 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
     });
   }
 
+  function appendArrayItem(fieldPath, template = '') {
+    setDraft(prev => {
+      const keys = fieldPath.split('.');
+      const next = Array.isArray(prev) ? [...prev] : { ...prev };
+      let pointer = next;
+      keys.forEach((rawKey, index) => {
+        const key = Number.isNaN(Number(rawKey)) ? rawKey : Number(rawKey);
+        if (index === keys.length - 1) {
+          const arr = Array.isArray(pointer[key]) ? [...pointer[key]] : [];
+          pointer[key] = [...arr, template];
+        } else {
+          const nextValue = pointer[key];
+          const cloned = Array.isArray(nextValue) ? [...nextValue] : { ...nextValue };
+          pointer[key] = cloned;
+          pointer = cloned;
+        }
+      });
+      return next;
+    });
+  }
+
   function handleSaveClick() {
     setSaveStatus('saving');
     try {
@@ -325,6 +346,7 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
                               <option value="list">List</option>
                               <option value="pricing">Pricing Tiers</option>
                               <option value="faq">FAQ</option>
+                              <option value="banner">Banner</option>
                             </select>
                           </label>
                         </div>
@@ -383,6 +405,30 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
                               <div key={qi} style={{ marginTop: '0.4rem' }}>
                                 <input style={{ width: '100%', marginBottom: '0.25rem' }} placeholder={`Question ${qi + 1}`} value={item.q || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.items.${qi}.q`, e.target.value)} />
                                 <textarea rows="2" style={{ width: '100%' }} placeholder={`Answer ${qi + 1}`} value={item.a || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.items.${qi}.a`, e.target.value)} />
+                              </div>
+                            ))}
+                            <button
+                              type="button"
+                              className="button-outline"
+                              style={{ marginTop: '0.5rem', fontSize: '0.8rem', padding: '0.35rem 0.85rem' }}
+                              onClick={() => appendArrayItem(`servicePages.${slug}.sections.${si}.items`, { q: '', a: '' })}
+                            >
+                              ＋ Add Q&amp;A
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Banner items */}
+                        {sec.type === 'banner' && sec.items && (
+                          <div style={{ marginTop: '0.75rem' }}>
+                            <p className="upload-hint" style={{ marginBottom: 0 }}>Banner lines:</p>
+                            {sec.items.map((line, li) => (
+                              <div key={li} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.4rem' }}>
+                                <input style={{ flex: 8 }} placeholder={`Line ${li + 1}`} value={line.desc || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.items.${li}.desc`, e.target.value)} />
+                                <label style={{ flex: '0 0 auto', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.3rem', margin: 0 }}>
+                                  <input type="checkbox" checked={!!line.hi} onChange={e => updateField(`servicePages.${slug}.sections.${si}.items.${li}.hi`, e.target.checked)} />
+                                  Highlight
+                                </label>
                               </div>
                             ))}
                           </div>

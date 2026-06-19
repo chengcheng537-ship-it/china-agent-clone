@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore';
 
 /*
  * ============================================================================
@@ -35,6 +35,24 @@ export function initFirebase() {
   }
 
   return { db };
+}
+
+export async function submitInquiry(data) {
+  const { db } = initFirebase();
+  const colRef = collection(db, 'inquiries');
+  const docRef = await addDoc(colRef, {
+    ...data,
+    createdAt: new Date().toISOString(),
+  });
+  return docRef.id;
+}
+
+export async function getInquiries() {
+  const { db } = initFirebase();
+  const colRef = collection(db, 'inquiries');
+  const q = query(colRef, orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
 export async function fetchSiteContent() {

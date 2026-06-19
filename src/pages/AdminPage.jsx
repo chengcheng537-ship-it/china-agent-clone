@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getInquiries } from '../firebase';
 
 const ADMIN_PASSWORD = 'cb2026';
 
@@ -7,10 +8,30 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
   const [authenticated, setAuthenticated] = useState(false);
   const [draft, setDraft] = useState(content);
   const [saveStatus, setSaveStatus] = useState('');
+  const [inquiries, setInquiries] = useState([]);
+  const [inquiriesLoading, setInquiriesLoading] = useState(false);
 
   useEffect(() => {
     setDraft(content);
   }, [content]);
+
+  useEffect(() => {
+    if (authenticated && firebaseReady) {
+      setInquiriesLoading(true);
+      getInquiries()
+        .then(setInquiries)
+        .catch(() => {})
+        .finally(() => setInquiriesLoading(false));
+    }
+  }, [authenticated, firebaseReady]);
+
+  function refreshInquiries() {
+    setInquiriesLoading(true);
+    getInquiries()
+      .then(setInquiries)
+      .catch(() => {})
+      .finally(() => setInquiriesLoading(false));
+  }
 
   function handleAuthSubmit(event) {
     event.preventDefault();
@@ -380,6 +401,47 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
                   <label>Email<input value={draft.contact?.email || ''} onChange={e => updateField('contact.email', e.target.value)} /></label>
                 </div>
                 <label>Address<input value={draft.contact?.address || ''} onChange={e => updateField('contact.address', e.target.value)} /></label>
+              </div>
+
+              {/* ========== Inquiries ========== */}
+              <div className="form-group">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <h2>Client Inquiries ({inquiries.length})</h2>
+                  <button className="button button-outline" onClick={refreshInquiries} disabled={inquiriesLoading} style={{ fontSize: '0.85rem', padding: '0.4rem 1rem' }}>
+                    {inquiriesLoading ? 'Loading...' : '🔄 Refresh'}
+                  </button>
+                </div>
+                <p className="upload-hint">Submissions from the website inquiry form. Newest first.</p>
+                {inquiries.length === 0 && !inquiriesLoading ? (
+                  <p className="upload-hint">No inquiries yet.</p>
+                ) : (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table className="inquiry-table">
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Company</th>
+                          <th>Service</th>
+                          <th>Message</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {inquiries.map(inq => (
+                          <tr key={inq.id}>
+                            <td style={{ whiteSpace: 'nowrap' }}>{inq.createdAt ? new Date(inq.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+                            <td style={{ fontWeight: 600 }}>{inq.name || '—'}</td>
+                            <td><a href={`mailto:${inq.email}`}>{inq.email || '—'}</a></td>
+                            <td>{inq.company || '—'}</td>
+                            <td style={{ whiteSpace: 'nowrap' }}>{inq.serviceName || '—'}</td>
+                            <td style={{ maxWidth: '220px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={inq.message}>{inq.message || '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
 
               {/* ========== Save ========== */}

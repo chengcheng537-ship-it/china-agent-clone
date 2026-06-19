@@ -1,8 +1,13 @@
 import { useParams, Link } from 'react-router-dom';
+import { useState } from 'react';
+import InquiryModal from '../components/InquiryModal';
 
 function ServicePage({ content, loading }) {
   const { slug } = useParams();
   const page = content.servicePages?.[slug];
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const openModal = (e) => { e.preventDefault(); setModalOpen(true); };
 
   if (loading) {
     return <div className="loading-panel">Loading...</div>;
@@ -29,9 +34,9 @@ function ServicePage({ content, loading }) {
           <h1>{page.heroTitle}</h1>
           <p className="service-hero-desc">{page.heroDescription}</p>
           {page.ctaText && (
-            <a className="button button-primary" href={page.ctaLink || '#contact'}>
+            <button className="button button-primary" onClick={openModal}>
               {page.ctaText}
-            </a>
+            </button>
           )}
         </div>
         {/* Image placeholder */}
@@ -121,11 +126,19 @@ function ServicePage({ content, loading }) {
       {page.ctaText && (
         <section className="section service-cta">
           <h2>Ready to get started?</h2>
-          <a className="button button-primary" href={page.ctaLink || '#contact'}>
+          <button className="button button-primary" onClick={openModal}>
             {page.ctaText}
-          </a>
+          </button>
         </section>
       )}
+
+      {/* Inquiry Modal */}
+      <InquiryModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        serviceName={page?.title || ''}
+        pageUrl={window.location.href}
+      />
     </div>
   );
 }

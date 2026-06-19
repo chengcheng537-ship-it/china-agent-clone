@@ -125,8 +125,26 @@ const defaultContent = {
   }
 };
 
+const CACHE_KEY = 'eastlink_site_content';
+
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveCache(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+  } catch { /* quota exceeded, ignore */ }
+}
+
 function App() {
-  const [content, setContent] = useState(defaultContent);
+  const cached = loadCache();
+  const [content, setContent] = useState(cached || defaultContent);
   const [loading, setLoading] = useState(true);
   const [firebaseReady, setFirebaseReady] = useState(false);
   const navigate = useNavigate();
@@ -136,8 +154,10 @@ function App() {
   useEffect(() => {
     let active = true;
 
-    // 页面秒开：先从本地默认内容展示，Firebase 后台静默同步
-    setLoading(false);
+    // 有缓存就直接展示，无需 loading
+    if (cached) {
+      setLoading(false);
+    }
 
     async function loadContent() {
       try {
@@ -145,10 +165,16 @@ function App() {
         setFirebaseReady(true);
         const remote = await fetchSiteContent();
         if (remote && active) {
-          setContent({ ...defaultContent, ...remote });
+          const merged = { ...defaultContent, ...remote };
+          setContent(merged);
+          saveCache(merged);
+          if (!cached) setLoading(false);
+        } else if (!cached) {
+          setLoading(false);
         }
       } catch (error) {
         console.warn('Firebase not configured or failed to load, using local defaults.', error.message);
+        if (!cached) setLoading(false);
       }
     }
 
@@ -182,6 +208,7 @@ function App() {
     try {
       await saveSiteContent(updated);
       setContent(updated);
+      saveCache(updated);
       alert('Content saved to Firebase.');
     } catch (error) {
       console.error(error);
@@ -203,6 +230,7 @@ function App() {
       }
       await saveSiteContent(updated);
       setContent(updated);
+      saveCache(updated);
       setLoading(false);
     } catch (error) {
       console.error(error);

@@ -148,24 +148,27 @@ function loadCache() {
   }
 }
 
-// Deep-merge servicePages: keep admin's edits (top-level + existing sections),
-// but inject code-updated sections (banner, FAQ) that don't exist in remote.
+// Deep-merge servicePages: code defaults take priority for top-level fields
+// (so $95→$99, banner→list, new FAQ sections survive).
+// Sections: remote order kept; code-new sections appended at end.
 function deepMergeServicePages(defaultPages, remotePages) {
   const result = {};
   for (const slug of Object.keys(defaultPages)) {
     const dp = defaultPages[slug];
     const rp = remotePages[slug] || {};
-    // Top-level fields: admin edits (remote) take priority over code defaults
-    const merged = { ...dp, ...rp };
+    // Code defaults win for top-level fields — admin re-saves after customization
+    const merged = { ...rp, ...dp };
     if (dp.sections) {
-      const remoteTitleSet = new Set((rp.sections || []).map(s => s.title));
-      const sections = [...(rp.sections || [])];
-      for (const ds of dp.sections) {
-        if (!remoteTitleSet.has(ds.title)) {
-          sections.push(ds); // New section from code update
-        }
-      }
-      merged.sections = sections;
+      const remoteByTitle = {};
+      (rp.sections || []).forEach(s => { remoteByTitle[s.title] = s; });
+      // Follow code-default section order; use remote version when it exists
+      const ordered = dp.sections.map(ds => remoteByTitle[ds.title] || ds);
+      // Append any remote sections that are not in code defaults
+      const defTitles = new Set(dp.sections.map(s => s.title));
+      (rp.sections || []).forEach(rs => {
+        if (!defTitles.has(rs.title)) ordered.push(rs);
+      });
+      merged.sections = ordered;
     }
     result[slug] = merged;
   }

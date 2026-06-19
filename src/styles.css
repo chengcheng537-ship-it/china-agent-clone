@@ -218,6 +218,7 @@ button, input, textarea {
 }
 .service-section .section-header h2 {
   font-size: 1.8rem;
+  white-space: pre-line;
 }
 
 /* Features grid */

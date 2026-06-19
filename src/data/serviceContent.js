@@ -43,7 +43,7 @@ const servicePages = {
         ]
       },
       {
-        title: 'You\'re not paying for a report. You\'re pre-paying for proof.',
+        title: 'You\'re not paying for a report.\nYou\'re pre-paying for proof.',
         type: 'list',
         items: [
           'The $99 isn\'t a fee. It\'s a deposit on your next move.',

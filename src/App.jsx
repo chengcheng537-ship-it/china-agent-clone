@@ -159,14 +159,21 @@ function deepMergeServicePages(defaultPages, remotePages) {
     // Remote wins for top-level → admin edits survive across reloads
     const merged = { ...dp, ...rp };
     if (dp.sections) {
-      const remoteByTitle = {};
-      (rp.sections || []).forEach(s => { remoteByTitle[s.title] = s; });
-      // Follow code-default section order; use remote version when it exists
-      const ordered = dp.sections.map(ds => remoteByTitle[ds.title] || ds);
-      // Append any remote sections that are not in code defaults
-      const defTitles = new Set(dp.sections.map(s => s.title));
+      // Normalise whitespace so "\n" vs " " doesn't create duplicate match failures
+      const norm = (s) => (s || '').replace(/\s+/g, ' ').trim();
+      const remoteByNorm = {};
+      (rp.sections || []).forEach(s => { remoteByNorm[norm(s.title)] = s; });
+      const defNormTitles = new Set(dp.sections.map(s => norm(s.title)));
+      // Follow code-default order; keep code type/title, pick up remote items
+      const ordered = dp.sections.map(ds => {
+        const rs = remoteByNorm[norm(ds.title)];
+        if (!rs) return ds;
+        const contentKey = ds.type === 'pricing' ? 'tiers' : 'items';
+        return { ...ds, [contentKey]: rs[contentKey] || ds[contentKey] };
+      });
+      // Append any remote sections that are NOT in code defaults
       (rp.sections || []).forEach(rs => {
-        if (!defTitles.has(rs.title)) ordered.push(rs);
+        if (!defNormTitles.has(norm(rs.title))) ordered.push(rs);
       });
       merged.sections = ordered;
     }

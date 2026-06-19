@@ -151,8 +151,11 @@ function loadCache() {
 // Deep-merge servicePages: remote wins for top-level fields (admin edits persist).
 // Sections keep code-default order, but matched remote sections win for type,
 // title and content. Code defaults only fill missing fields and new sections.
+// Empty-title code-default sections (blank templates) use positional matching
+// so admin-filled titles don't cause duplicates or wrong positions.
 function deepMergeServicePages(defaultPages, remotePages) {
   const result = {};
+  const hasText = (value) => typeof value === 'string' && value.trim().length > 0;
   for (const slug of Object.keys(defaultPages)) {
     const dp = defaultPages[slug];
     const rp = remotePages[slug] || {};
@@ -166,7 +169,23 @@ function deepMergeServicePages(defaultPages, remotePages) {
       const defNormTitles = new Set(dp.sections.map(s => norm(s.title)));
       // Follow code-default order; matched remote section wins so admin edits
       // to type/title/items/tiers are not overwritten by code defaults.
-      const ordered = dp.sections.map(ds => {
+      const ordered = dp.sections.map((ds, dsIdx) => {
+        // Empty-title code-default sections are blank templates — use positional
+        // matching because title matching fails once admin fills in a real title.
+        if (!hasText(ds.title)) {
+          const positionalRs = remoteSections[dsIdx];
+          if (positionalRs && !usedRemoteIndexes.has(dsIdx)) {
+            usedRemoteIndexes.add(dsIdx);
+            return {
+              ...ds,
+              ...positionalRs,
+              items: positionalRs.items ?? ds.items,
+              tiers: positionalRs.tiers ?? ds.tiers,
+            };
+          }
+          return ds;
+        }
+        // Named sections: match by normalised title
         const remoteIndex = remoteSections.findIndex((rs, idx) => (
           !usedRemoteIndexes.has(idx) && norm(rs.title) === norm(ds.title)
         ));

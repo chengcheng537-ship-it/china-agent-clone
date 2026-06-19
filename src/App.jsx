@@ -148,6 +148,34 @@ function loadCache() {
   }
 }
 
+// Deep-merge servicePages: keep admin's edits (top-level + existing sections),
+// but inject code-updated sections (banner, FAQ) that don't exist in remote.
+function deepMergeServicePages(defaultPages, remotePages) {
+  const result = {};
+  for (const slug of Object.keys(defaultPages)) {
+    const dp = defaultPages[slug];
+    const rp = remotePages[slug] || {};
+    // Top-level fields: admin edits (remote) take priority over code defaults
+    const merged = { ...dp, ...rp };
+    if (dp.sections) {
+      const remoteTitleSet = new Set((rp.sections || []).map(s => s.title));
+      const sections = [...(rp.sections || [])];
+      for (const ds of dp.sections) {
+        if (!remoteTitleSet.has(ds.title)) {
+          sections.push(ds); // New section from code update
+        }
+      }
+      merged.sections = sections;
+    }
+    result[slug] = merged;
+  }
+  // Also preserve any pages only in remote
+  for (const slug of Object.keys(remotePages)) {
+    if (!result[slug]) result[slug] = remotePages[slug];
+  }
+  return result;
+}
+
 function saveCache(data) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(data));
@@ -177,7 +205,14 @@ function App() {
         setFirebaseReady(true);
         const remote = await fetchPublicContent();
         if (remote && active) {
-          const merged = { ...defaultContent, ...remote };
+          // Deep-merge servicePages so code-updated sections (banner, FAQ) appear alongside admin edits
+          const merged = {
+            ...defaultContent,
+            ...remote,
+            servicePages: remote.servicePages
+              ? deepMergeServicePages(defaultContent.servicePages, remote.servicePages)
+              : defaultContent.servicePages,
+          };
           setContent(merged);
           saveCache(merged);
           if (!cached) setLoading(false);

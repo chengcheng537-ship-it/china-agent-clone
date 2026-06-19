@@ -352,11 +352,11 @@ function App() {
                 e.currentTarget.parentElement.classList.toggle('open');
               }}>Services <span className="arrow">▾</span></button>
               <div className="nav-dropdown-menu">
-                <Link to="/services/reality-check">Supplier Reality Check™ — $95</Link>
-                <Link to="/services/due-diligence">Due Diligence</Link>
-                <Link to="/services/contracts">Contracts</Link>
-                <Link to="/services/guided-visits">Guided Visits</Link>
-                <Link to="/services/fixer">Fixer</Link>
+                <Link to="/services/reality-check">{content.servicePages?.['reality-check']?.navLabel || 'Supplier Reality Check™'}</Link>
+                <Link to="/services/due-diligence">{content.servicePages?.['due-diligence']?.navLabel || 'Due Diligence'}</Link>
+                <Link to="/services/contracts">{content.servicePages?.contracts?.navLabel || 'Contracts'}</Link>
+                <Link to="/services/guided-visits">{content.servicePages?.['guided-visits']?.navLabel || 'Guided Visits'}</Link>
+                <Link to="/services/fixer">{content.servicePages?.fixer?.navLabel || 'Fixer'}</Link>
               </div>
             </div>
             <Link to="/#contact">Contact Us</Link>

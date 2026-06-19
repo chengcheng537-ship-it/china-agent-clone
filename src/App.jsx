@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { saveSiteContent, fileToBase64, initFirebase } from './firebase';
 import HomePage from './pages/HomePage';
@@ -149,61 +149,25 @@ function loadCache() {
 }
 
 // Deep-merge servicePages: remote wins for top-level fields (admin edits persist).
-// Sections keep code-default order, but matched remote sections win for type,
-// title and content. Code defaults only fill missing fields and new sections.
-// Empty-title code-default sections (blank templates) use positional matching
-// so admin-filled titles don't cause duplicates or wrong positions.
+// Sections use position-based (index) matching so admin can safely edit ANY field
+// — including title — without creating duplicates or breaking section order.
+// Extra remote sections beyond code-default length are appended; missing remote
+// sections fall back to code defaults.
 function deepMergeServicePages(defaultPages, remotePages) {
   const result = {};
-  const hasText = (value) => typeof value === 'string' && value.trim().length > 0;
   for (const slug of Object.keys(defaultPages)) {
     const dp = defaultPages[slug];
     const rp = remotePages[slug] || {};
     // Remote wins for top-level → admin edits survive across reloads
     const merged = { ...dp, ...rp };
     if (dp.sections) {
-      // Normalise whitespace so "\n" vs " " doesn't create duplicate match failures
-      const norm = (s) => (s || '').replace(/\s+/g, ' ').trim();
       const remoteSections = rp.sections || [];
-      const usedRemoteIndexes = new Set();
-      const defNormTitles = new Set(dp.sections.map(s => norm(s.title)));
-      // Follow code-default order; matched remote section wins so admin edits
-      // to type/title/items/tiers are not overwritten by code defaults.
-      const ordered = dp.sections.map((ds, dsIdx) => {
-        // Empty-title code-default sections are blank templates — use positional
-        // matching because title matching fails once admin fills in a real title.
-        // Safety check: only position-match if the remote section at this index
-        // doesn't belong to a DIFFERENT code-default section (by title). This
-        // prevents a blank slot from "stealing" a named section when the remote
-        // array is shorter than the code-default array (e.g. old Firebase data).
-        if (!hasText(ds.title)) {
-          const positionalRs = remoteSections[dsIdx];
-          if (positionalRs && !usedRemoteIndexes.has(dsIdx)) {
-            const rsNormTitle = norm(positionalRs.title);
-            // If the remote section at this slot has a title that matches some
-            // OTHER code-default section (e.g. FAQ got shifted here because the
-            // remote array is shorter), skip positional matching so the real
-            // title-match can claim it.
-            const belongsToOther = hasText(positionalRs.title) && defNormTitles.has(rsNormTitle);
-            if (!belongsToOther) {
-              usedRemoteIndexes.add(dsIdx);
-              return {
-                ...ds,
-                ...positionalRs,
-                items: positionalRs.items ?? ds.items,
-                tiers: positionalRs.tiers ?? ds.tiers,
-              };
-            }
-          }
-          return ds;
-        }
-        // Named sections: match by normalised title
-        const remoteIndex = remoteSections.findIndex((rs, idx) => (
-          !usedRemoteIndexes.has(idx) && norm(rs.title) === norm(ds.title)
-        ));
-        if (remoteIndex === -1) return ds;
-        usedRemoteIndexes.add(remoteIndex);
-        const rs = remoteSections[remoteIndex];
+      // Position-based merge: section at index N in code defaults maps to
+      // section at index N in remote. Admin can rename, retype, or rewrite
+      // anything without breaking the mapping.
+      const ordered = dp.sections.map((ds, idx) => {
+        const rs = remoteSections[idx];
+        if (!rs) return ds;
         return {
           ...ds,
           ...rs,
@@ -211,10 +175,11 @@ function deepMergeServicePages(defaultPages, remotePages) {
           tiers: rs.tiers ?? ds.tiers,
         };
       });
-      // Append any remote sections that are NOT in code defaults
-      remoteSections.forEach((rs, idx) => {
-        if (!usedRemoteIndexes.has(idx) && !defNormTitles.has(norm(rs.title))) ordered.push(rs);
-      });
+      // Append any remote sections beyond code-default length (new sections
+      // added by admin will appear after all code-default sections).
+      for (let i = dp.sections.length; i < remoteSections.length; i++) {
+        ordered.push(remoteSections[i]);
+      }
       merged.sections = ordered;
     }
     // Fixup: stale $95 → $99 in all text fields
@@ -261,6 +226,18 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const isAdmin = location.pathname === '/admin';
+  const dropdownRef = useRef(null);
+
+  // Close Services dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        dropdownRef.current.classList.remove('open');
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -388,8 +365,9 @@ function App() {
           <nav className="site-nav">
             <Link to="/">Home</Link>
             <Link to="/#about">About Us</Link>
-            <div className="nav-dropdown">
+            <div className="nav-dropdown" ref={dropdownRef}>
               <button className="nav-dropdown-toggle" onClick={(e) => {
+                e.stopPropagation();
                 e.currentTarget.parentElement.classList.toggle('open');
               }}>Services <span className="arrow">▾</span></button>
               <div className="nav-dropdown-menu">

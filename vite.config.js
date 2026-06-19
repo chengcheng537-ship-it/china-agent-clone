@@ -1,7 +1,5 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { writeFileSync } from 'fs';
-import { resolve } from 'path';
 
 const BUILD_ID = Date.now().toString(36);
 
@@ -10,9 +8,10 @@ export default defineConfig({
     react(),
     {
       name: 'inject-build-id',
+      generateBundle() {
+        this.emitFile({ type: 'asset', fileName: 'version.txt', source: BUILD_ID });
+      },
       transformIndexHtml(html) {
-        // 写入 version.txt 供运行时检测
-        writeFileSync(resolve(__dirname, 'public/version.txt'), BUILD_ID);
         // 注入自刷新脚本（通过 fetch version.txt 绕过 HTML 缓存）
         return html.replace(
           '</head>',

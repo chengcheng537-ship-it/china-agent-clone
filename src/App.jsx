@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
-import { fetchSiteContent, saveSiteContent, fileToBase64, initFirebase } from './firebase';
+import { saveSiteContent, fileToBase64, initFirebase } from './firebase';
 import HomePage from './pages/HomePage';
 import AdminPage from './pages/AdminPage';
 
@@ -125,7 +125,16 @@ const defaultContent = {
   }
 };
 
-const CACHE_KEY = 'eastlink_site_content';
+const CACHE_KEY = 'eastlink_site_content_v3';
+
+async function fetchPublicContent() {
+  const response = await fetch(`/api/content?ts=${Date.now()}`, { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error(`Content API failed: ${response.status}`);
+  }
+  const data = await response.json();
+  return data.content;
+}
 
 function loadCache() {
   try {
@@ -163,7 +172,7 @@ function App() {
       try {
         initFirebase();
         setFirebaseReady(true);
-        const remote = await fetchSiteContent();
+        const remote = await fetchPublicContent();
         if (remote && active) {
           const merged = { ...defaultContent, ...remote };
           setContent(merged);
@@ -173,7 +182,7 @@ function App() {
           setLoading(false);
         }
       } catch (error) {
-        console.warn('Firebase not configured or failed to load, using local defaults.', error.message);
+        console.warn('Remote content failed to load, using local defaults.', error.message);
         if (!cached) setLoading(false);
       }
     }

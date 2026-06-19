@@ -44,11 +44,11 @@ const servicePages = {
       },
       {
         title: 'You\'re not paying for a report. You\'re pre-paying for proof.',
-        type: 'banner',
+        type: 'list',
         items: [
-          { title: '', desc: 'The $99 isn\'t a fee. It\'s a deposit on your next move.', hi: false },
-          { title: '', desc: 'Upgrade to any verification, visit, or contract service within 30 days, and the $99 comes off the price.', hi: false },
-          { title: '', desc: 'No extra cost for the truth. You only spend more if it\'s worth acting on.', hi: true }
+          'The $99 isn\'t a fee. It\'s a deposit on your next move.',
+          'Upgrade to any verification, visit, or contract service within 30 days, and the $99 comes off the price.',
+          'No extra cost for the truth. You only spend more if it\'s worth acting on.'
         ]
       },
       {

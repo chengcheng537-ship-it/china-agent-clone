@@ -422,7 +422,16 @@ function App() {
             return;
           }
           if (remoteVersion && String(remoteVersion) === String(cached._contentVersion)) {
-            setContent(cached);
+            const merged = {
+              ...defaultContent,
+              ...cached,
+              servicePages: cached.servicePages
+                ? deepMergeServicePages(defaultContent.servicePages, cached.servicePages)
+                : defaultContent.servicePages,
+            };
+            merged.contact = normalizeContactLegacy(merged.contact);
+            setContent(merged);
+            saveCache(merged);
             setLoading(false);
             return;
           }

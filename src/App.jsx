@@ -162,6 +162,17 @@ function deepMergeServicePages(defaultPages, remotePages) {
   const result = {};
   const norm = (s) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
   const hasText = (v) => typeof v === 'string' && v.trim().length > 0;
+  // Merge items/tiers arrays: remote wins positionally; extra code-default
+  // entries (e.g. newly added blank tiers) are appended at the end.
+  const mergeArrayField = (defaultArr, remoteArr) => {
+    if (!remoteArr || remoteArr.length === 0) return defaultArr;
+    if (!defaultArr) return remoteArr;
+    const merged = [...remoteArr];
+    for (let i = remoteArr.length; i < defaultArr.length; i++) {
+      merged.push(defaultArr[i]);
+    }
+    return merged;
+  };
   for (const slug of Object.keys(defaultPages)) {
     const dp = defaultPages[slug];
     const rp = remotePages[slug] || {};
@@ -181,7 +192,7 @@ function deepMergeServicePages(defaultPages, remotePages) {
           if (titleMatchIdx !== -1) {
             usedRemote.add(titleMatchIdx);
             const rs = remoteSections[titleMatchIdx];
-            return { ...ds, ...rs, items: rs.items ?? ds.items, tiers: rs.tiers ?? ds.tiers };
+            return { ...ds, ...rs, items: mergeArrayField(ds.items, rs.items), tiers: mergeArrayField(ds.tiers, rs.tiers) };
           }
         }
 
@@ -200,7 +211,7 @@ function deepMergeServicePages(defaultPages, remotePages) {
             if (belongsToOther) return ds;
           }
           usedRemote.add(dsIdx);
-          return { ...ds, ...rs, items: rs.items ?? ds.items, tiers: rs.tiers ?? ds.tiers };
+          return { ...ds, ...rs, items: mergeArrayField(ds.items, rs.items), tiers: mergeArrayField(ds.tiers, rs.tiers) };
         }
 
         // Step 3 — keep code default

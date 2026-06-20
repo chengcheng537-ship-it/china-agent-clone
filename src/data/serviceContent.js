@@ -252,7 +252,22 @@ const servicePages = {
         tiers: [
           { name: 'Quick Dispute Review — $795', desc: 'Diagnostic-only. You send documents. We write back with assessment: what happened, what\'s recoverable, your real options. 2–3 business days.', features: ['Full document review', 'Written diagnostic', 'Recovery probability assessment', 'No supplier contact'] },
           { name: 'Tier 2 Negotiation — from $1,950', desc: 'Active intervention. Direct negotiation with factory owner. Chinese-language pressure correspondence. Documented agreement.', features: ['Direct negotiation with factory owner', 'Chinese-language correspondence', 'Documented agreement (English + Chinese, chopped)', 'On-site presence as needed'] },
-          { name: 'Full Fixer — Custom Quote', desc: 'Sustained intervention until the matter is closed. Best for high-stakes disputes or cases needing a permanent China-side representative.', features: ['Sustained on-site presence (up to 30 days)', 'Coordinated legal escalation if required', 'Recovery execution', 'Final close-out report'] }
+          { name: 'Full Fixer — Custom Quote', desc: 'Sustained intervention until the matter is closed. Best for high-stakes disputes or cases needing a permanent China-side representative.', features: ['Sustained on-site presence (up to 30 days)', 'Coordinated legal escalation if required', 'Recovery execution', 'Final close-out report'] },
+          { name: '', desc: '', features: [''] }
+        ]
+      },
+      {
+        title: 'When the dispute exceeds these tiers',
+        type: 'features',
+        items: [
+          { title: '', desc: '' }
+        ]
+      },
+      {
+        title: 'What this looks like in practice',
+        type: 'features',
+        items: [
+          { title: '', desc: '' }
         ]
       },
       {

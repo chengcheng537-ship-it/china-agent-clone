@@ -149,12 +149,15 @@ function loadCache() {
 }
 
 // Deep-merge servicePages: remote wins for top-level fields (admin edits persist).
-// Named sections use position-based (index) matching so admin can safely edit
-// ANY field — including title — without creating duplicates.
-// Blank (empty-title) sections use position matching with a safety check: if the
-// remote section at the same index appears to belong to a different code-default
-// section (e.g. FAQ got shifted because the remote array is shorter), skip the
-// merge to avoid duplicates. Extra remote sections are appended at the end.
+// Sections use title-first + positional-fallback matching:
+//   1. Try to find an unmatched remote section with the SAME normalised title.
+//   2. If not found, try the remote section at the SAME array index (with a
+//      safety check to avoid stealing a section that belongs elsewhere).
+//   3. Otherwise keep the code default.
+// Unmatched remote sections are appended at the end.
+// This lets admin rename, retype, or rewrite any field without duplicates,
+// and safely handles the transitional state when code has more sections
+// than Firebase (e.g. after adding new sections to code defaults).
 function deepMergeServicePages(defaultPages, remotePages) {
   const result = {};
   const norm = (s) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
@@ -166,31 +169,49 @@ function deepMergeServicePages(defaultPages, remotePages) {
     const merged = { ...dp, ...rp };
     if (dp.sections) {
       const remoteSections = rp.sections || [];
-      const ordered = dp.sections.map((ds, idx) => {
-        const rs = remoteSections[idx];
-        if (!rs) return ds;
-        // Named sections: pure positional merge — admin can rename freely
+      const usedRemote = new Set();
+
+      const ordered = dp.sections.map((ds, dsIdx) => {
+        // Step 1 — title match (named sections only; blank sections skip)
         if (hasText(ds.title)) {
+          const dsNorm = norm(ds.title);
+          const titleMatchIdx = remoteSections.findIndex((rs, rsIdx) =>
+            !usedRemote.has(rsIdx) && norm(rs.title) === dsNorm
+          );
+          if (titleMatchIdx !== -1) {
+            usedRemote.add(titleMatchIdx);
+            const rs = remoteSections[titleMatchIdx];
+            return { ...ds, ...rs, items: rs.items ?? ds.items, tiers: rs.tiers ?? ds.tiers };
+          }
+        }
+
+        // Step 2 — positional fallback (with safety check)
+        const rs = remoteSections[dsIdx];
+        if (rs && !usedRemote.has(dsIdx)) {
+          // Safety: if the remote section at this slot has a title matching
+          // a DIFFERENT code-default section, it was shifted by array length
+          // mismatch — skip so the real title-match can claim it later.
+          if (hasText(rs.title)) {
+            const rsNorm = norm(rs.title);
+            const belongsToOther = dp.sections.some(
+              (otherDs, otherIdx) => otherIdx !== dsIdx &&
+                hasText(otherDs.title) && norm(otherDs.title) === rsNorm
+            );
+            if (belongsToOther) return ds;
+          }
+          usedRemote.add(dsIdx);
           return { ...ds, ...rs, items: rs.items ?? ds.items, tiers: rs.tiers ?? ds.tiers };
         }
-        // Blank template: safety-check that remote section at this position
-        // doesn't "belong" to a different code-default section by title.
-        // This handles the transitional state when code has more sections
-        // than Firebase (e.g. a new blank section was just added to code).
-        if (hasText(rs.title)) {
-          const rsNorm = norm(rs.title);
-          const belongsToOther = dp.sections.some(
-            (otherDs, otherIdx) => otherIdx !== idx && hasText(otherDs.title) && norm(otherDs.title) === rsNorm
-          );
-          if (belongsToOther) return ds; // skip — this remote section belongs elsewhere
-        }
-        // Safe to merge: both blank, or remote has a unique new title
-        return { ...ds, ...rs, items: rs.items ?? ds.items, tiers: rs.tiers ?? ds.tiers };
+
+        // Step 3 — keep code default
+        return ds;
       });
-      // Append any remote sections beyond code-default length
-      for (let i = dp.sections.length; i < remoteSections.length; i++) {
-        ordered.push(remoteSections[i]);
-      }
+
+      // Append any unmatched remote sections (new sections added by admin)
+      remoteSections.forEach((rs, rsIdx) => {
+        if (!usedRemote.has(rsIdx)) ordered.push(rs);
+      });
+
       merged.sections = ordered;
     }
     // Fixup: stale $95 → $99 in all text fields

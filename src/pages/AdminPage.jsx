@@ -119,10 +119,34 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
     });
   }
 
+  function cleanDraftBeforeSave(data) {
+    const hasText = value => typeof value === 'string' && value.trim().length > 0;
+    const tierHasContent = tier => hasText(tier?.name) || hasText(tier?.desc) || tier?.features?.some(hasText);
+    const cleaned = JSON.parse(JSON.stringify(data));
+
+    Object.values(cleaned.servicePages || {}).forEach(page => {
+      (page.sections || []).forEach(section => {
+        if (Array.isArray(section.tiers)) {
+          section.tiers = section.tiers
+            .filter(tierHasContent)
+            .map(tier => ({
+              ...tier,
+              features: Array.isArray(tier.features) ? tier.features.filter(hasText) : []
+            }));
+        }
+      });
+    });
+
+    return cleaned;
+  }
+
   async function handleSaveClick() {
     setSaveStatus('saving');
     try {
-      await onSave(draftRef.current);
+      const cleaned = cleanDraftBeforeSave(draftRef.current);
+      draftRef.current = cleaned;
+      setDraft(cleaned);
+      await onSave(cleaned);
       setSaveStatus('done');
       setTimeout(() => setSaveStatus(''), 3000);
     } catch (err) {
@@ -478,12 +502,12 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
                                   }}
                                 >✕</button>
                                 <div className="form-grid">
-                                  <label>Tier Name<input value={tier.name || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.name`, e.target.value)} /></label>
+                                  <label>Tier Name<input value={tier?.name || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.name`, e.target.value)} /></label>
                                 </div>
-                                <label>Description<textarea rows="2" value={tier.desc || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.desc`, e.target.value)} /></label>
+                                <label>Description<textarea rows="2" value={tier?.desc || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.desc`, e.target.value)} /></label>
                                 <div style={{ marginTop: '0.5rem' }}>
                                   <p className="upload-hint" style={{ marginBottom: 0 }}>Features:</p>
-                                  {(tier.features || []).map((f, fi) => (
+                                  {(tier?.features || []).map((f, fi) => (
                                     <input key={fi} style={{ marginTop: '0.3rem', width: '100%' }} placeholder={`Feature ${fi + 1}`} value={f || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.features.${fi}`, e.target.value)} />
                                   ))}
                                   <button

@@ -12,9 +12,10 @@ function ServicePage({ content, loading }) {
   const itemHasContent = (item) => typeof item === 'string'
     ? hasText(item)
     : hasText(item?.title) || hasText(item?.desc) || hasText(item?.q) || hasText(item?.a);
+  const tierHasContent = (tier) => hasText(tier?.name) || hasText(tier?.desc) || tier?.features?.some(hasText);
   const sectionHasContent = (section) => {
     if (hasText(section.title)) return true;
-    if (section.type === 'pricing') return section.tiers?.some(tier => hasText(tier.name) || hasText(tier.desc) || tier.features?.some(hasText));
+    if (section.type === 'pricing') return section.tiers?.some(tierHasContent);
     return section.items?.some(itemHasContent);
   };
   const visibleSections = page?.sections?.filter(sectionHasContent) || [];
@@ -102,14 +103,14 @@ function ServicePage({ content, loading }) {
           )}
 
           {section.type === 'pricing' && (
-            <div className={`service-pricing-grid ${section.tiers?.length === 3 ? 'service-pricing-grid-three' : ''}`}>
-              {section.tiers?.map((tier, i) => (
+            <div className={`service-pricing-grid ${section.tiers?.filter(tierHasContent).length === 3 ? 'service-pricing-grid-three' : ''}`}>
+              {section.tiers?.filter(tierHasContent).map((tier, i) => (
                 <div className="service-pricing-card" key={i}>
-                  <h3>{tier.name}</h3>
-                  <p className="pricing-desc">{tier.desc}</p>
-                  {tier.features && (
+                  <h3>{tier?.name}</h3>
+                  <p className="pricing-desc">{tier?.desc}</p>
+                  {tier?.features && (
                     <ul className="pricing-features">
-                      {tier.features.map((f, j) => (
+                      {tier.features.filter(hasText).map((f, j) => (
                         <li key={j}>✓ {f}</li>
                       ))}
                     </ul>

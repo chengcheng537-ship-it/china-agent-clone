@@ -26,7 +26,12 @@ export default async function handler(request, response) {
 
   try {
     const snapshot = await getDoc(doc(getDb(), 'site', 'content'));
-    response.status(200).json({ content: snapshot.exists() ? snapshot.data() : null });
+    const data = snapshot.exists() ? snapshot.data() : null;
+    if (request.query?.version === '1') {
+      response.status(200).json({ version: data?._contentVersion || null });
+      return;
+    }
+    response.status(200).json({ content: data });
   } catch (error) {
     response.status(500).json({ error: error.message || 'Failed to load content' });
   }

@@ -145,6 +145,15 @@ async function fetchPublicContent() {
   return data.content;
 }
 
+async function fetchPublicContentVersion() {
+  const response = await fetch(`/api/content?version=1&ts=${Date.now()}`, { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error(`Content version API failed: ${response.status}`);
+  }
+  const data = await response.json();
+  return data.version;
+}
+
 function loadCache() {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
@@ -348,13 +357,14 @@ function normalizeContactLegacy(contact) {
 
 function App() {
   const cached = loadCache();
-  const [content, setContent] = useState(cached || defaultContent);
+  const [content, setContent] = useState(defaultContent);
   const [loading, setLoading] = useState(true);
   const [firebaseReady, setFirebaseReady] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const isAdmin = location.pathname === '/admin';
   const dropdownRef = useRef(null);
+  const localSaveVersionRef = useRef(0);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // Close mobile nav on route change
@@ -389,16 +399,28 @@ function App() {
   useEffect(() => {
     let active = true;
 
-    // 有缓存就直接展示，无需 loading
-    if (cached) {
-      setLoading(false);
-    }
-
     async function loadContent() {
+      const requestVersion = localSaveVersionRef.current;
       try {
         initFirebase();
         setFirebaseReady(true);
+
+        if (cached?._contentVersion) {
+          const remoteVersion = await fetchPublicContentVersion();
+          if (requestVersion !== localSaveVersionRef.current) {
+            return;
+          }
+          if (remoteVersion && String(remoteVersion) === String(cached._contentVersion)) {
+            setContent(cached);
+            setLoading(false);
+            return;
+          }
+        }
+
         const remote = await fetchPublicContent();
+        if (requestVersion !== localSaveVersionRef.current) {
+          return;
+        }
         if (remote && active) {
           // Deep-merge servicePages so code-updated sections (banner, FAQ) appear alongside admin edits
           const merged = {
@@ -411,13 +433,15 @@ function App() {
           merged.contact = normalizeContactLegacy(merged.contact);
           setContent(merged);
           saveCache(merged);
-          if (!cached) setLoading(false);
-        } else if (!cached) {
+          setLoading(false);
+        } else {
+          if (cached) setContent(cached);
           setLoading(false);
         }
       } catch (error) {
-        console.warn('Remote content failed to load, using local defaults.', error.message);
-        if (!cached) setLoading(false);
+        console.warn('Remote content failed to load, using cached/default content.', error.message);
+        if (cached) setContent(cached);
+        setLoading(false);
       }
     }
 
@@ -447,11 +471,13 @@ function App() {
   }, [content.seo, content.branding]);
 
   async function handleSave(updated) {
+    localSaveVersionRef.current += 1;
     setLoading(true);
     try {
-      await saveSiteContent(updated);
-      setContent(updated);
-      saveCache(updated);
+      const versioned = { ...updated, _contentVersion: Date.now() };
+      await saveSiteContent(versioned);
+      setContent(versioned);
+      saveCache(versioned);
       alert('Content saved to Firebase.');
     } catch (error) {
       console.error(error);
@@ -479,6 +505,7 @@ function App() {
   }
 
   async function handleUpload(field, file) {
+    localSaveVersionRef.current += 1;
     setLoading(true);
     try {
       const base64 = await fileToBase64(file);
@@ -491,9 +518,10 @@ function App() {
       } else {
         updated = { ...content, [field]: { ...content[field], image: base64 } };
       }
-      await saveSiteContent(updated);
-      setContent(updated);
-      saveCache(updated);
+      const versioned = { ...updated, _contentVersion: Date.now() };
+      await saveSiteContent(versioned);
+      setContent(versioned);
+      saveCache(versioned);
       setLoading(false);
     } catch (error) {
       console.error(error);

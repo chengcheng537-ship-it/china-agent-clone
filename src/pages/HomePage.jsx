@@ -101,6 +101,7 @@ function HomePage({ content, loading }) {
         </div>
       </section>
 
+      {content.visibility?.hubs !== false && (
       <section className="section hubs-section">
         <div className="section-header">
           <h2>Local Execution Centers</h2>
@@ -115,7 +116,9 @@ function HomePage({ content, loading }) {
           ))}
         </div>
       </section>
+      )}
 
+      {content.visibility?.startOptions !== false && (
       <section className="section plans-section">
         <div className="section-header">
           <h2>Four Ways to Get Started</h2>
@@ -131,7 +134,9 @@ function HomePage({ content, loading }) {
           ))}
         </div>
       </section>
+      )}
 
+      {content.visibility?.trustLogos !== false && (
       <section className="section brands-section">
         <div className="section-header">
           <h2>Partners &amp; Trust Sources</h2>
@@ -143,6 +148,7 @@ function HomePage({ content, loading }) {
           ))}
         </div>
       </section>
+      )}
 
       <section className="section about-section" id="about">
         <div className="about-content">

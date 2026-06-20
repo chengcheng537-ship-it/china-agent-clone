@@ -125,6 +125,11 @@ const defaultContent = {
   branding: {
     favicon: '',
     logo: ''
+  },
+  visibility: {
+    hubs: false,
+    startOptions: false,
+    trustLogos: false
   }
 };
 

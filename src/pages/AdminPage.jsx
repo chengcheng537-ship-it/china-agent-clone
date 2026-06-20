@@ -258,7 +258,17 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
 
               {/* ========== Hubs ========== */}
               <div className="form-group">
-                <h2>Execution Centers</h2>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <h2>Execution Centers</h2>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}>
+                    <input
+                      type="checkbox"
+                      checked={draft.visibility?.hubs !== false}
+                      onChange={e => updateField('visibility.hubs', e.target.checked)}
+                    />
+                    Show on site
+                  </label>
+                </div>
                 {draft.hubs?.map((item, i) => (
                   <div key={i} className="array-group">
                     <h3>Hub {i + 1}</h3>
@@ -268,11 +278,29 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
                     </div>
                   </div>
                 ))}
+                <button
+                  type="button"
+                  className="button-outline"
+                  style={{ marginTop: '0.5rem', fontSize: '0.8rem', padding: '0.35rem 0.85rem' }}
+                  onClick={() => appendArrayItem('hubs', { city: '', description: '' })}
+                >
+                  ＋ Add Hub
+                </button>
               </div>
 
               {/* ========== Plans / Pricing ========== */}
               <div className="form-group">
-                <h2>Plans &amp; Pricing</h2>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <h2>Plans &amp; Pricing</h2>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}>
+                    <input
+                      type="checkbox"
+                      checked={draft.visibility?.startOptions !== false}
+                      onChange={e => updateField('visibility.startOptions', e.target.checked)}
+                    />
+                    Show on site
+                  </label>
+                </div>
                 {draft.startOptions?.map((item, i) => (
                   <div key={i} className="array-group">
                     <h3>Plan {i + 1}</h3>
@@ -287,7 +315,17 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
 
               {/* ========== Trust Logos ========== */}
               <div className="form-group">
-                <h2>Trust &amp; Partner Brands</h2>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <h2>Trust &amp; Partner Brands</h2>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}>
+                    <input
+                      type="checkbox"
+                      checked={draft.visibility?.trustLogos !== false}
+                      onChange={e => updateField('visibility.trustLogos', e.target.checked)}
+                    />
+                    Show on site
+                  </label>
+                </div>
                 {draft.trustLogos?.map((item, i) => (
                   <label key={i}>
                     Item {i + 1}

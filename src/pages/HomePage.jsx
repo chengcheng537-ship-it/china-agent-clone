@@ -151,41 +151,22 @@ function HomePage({ content, loading }) {
       )}
 
       <section className="section about-section" id="about">
-        <div className="about-content">
+        <div className="about-content" id="contact">
           <h2>{content.about.title}</h2>
           <p>{content.about.content}</p>
-          <div className="contact-box">
-            <h3>{content.contact.title}</h3>
-            <p>{content.contact.lead}</p>
-            <p>Phone: {content.contact.phone}</p>
-            <p>Email: {content.contact.email}</p>
-            <p>Address: {content.contact.address}</p>
-          </div>
-        </div>
-        <div className="about-image-wrap">
-          {content.about.image ? (
-            <img src={content.about.image} alt="About Us" />
-          ) : (
-            <div className="image-fallback">Image Placeholder</div>
-          )}
-        </div>
-      </section>
-
-      <section className="section contact-section" id="contact">
-        <div className="contact-card">
-          <h2>{content.contact.title}</h2>
-          <p>{content.contact.lead}</p>
-          <div className="contact-item">
-            <strong>Email</strong>
-            <span>{content.contact.email}</span>
-          </div>
-          <div className="contact-item">
-            <strong>Phone</strong>
-            <span>{content.contact.phone}</span>
-          </div>
-          <div className="contact-item">
-            <strong>Address</strong>
-            <span>{content.contact.address}</span>
+          <div className="about-contact">
+            <div className="contact-item">
+              <strong>Phone</strong>
+              <span>{content.contact.phone}</span>
+            </div>
+            <div className="contact-item">
+              <strong>Email</strong>
+              <span>{content.contact.email}</span>
+            </div>
+            <div className="contact-item">
+              <strong>Address</strong>
+              <span>{content.contact.address}</span>
+            </div>
           </div>
         </div>
 

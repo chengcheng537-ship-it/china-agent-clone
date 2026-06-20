@@ -587,21 +587,19 @@ button, input, textarea {
 
 .about-section {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .about-content h2 {
   margin-top: 0;
 }
 
-.contact-box {
+.about-contact {
   margin-top: 2rem;
-  padding: 1.75rem;
-  border-radius: 1rem;
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  display: grid;
+  gap: 1.25rem;
 }
 
 .about-image-wrap {

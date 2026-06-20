@@ -162,11 +162,49 @@ function deepMergeServicePages(defaultPages, remotePages) {
   const result = {};
   const norm = (s) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
   const hasText = (v) => typeof v === 'string' && v.trim().length > 0;
-  // Merge items/tiers arrays: remote wins positionally; extra code-default
-  // entries (e.g. newly added blank tiers) are appended at the end.
+  // Merge items/tiers arrays: for object entries with a `name` field (tiers),
+  // match by normalised name so code-default reordering takes effect.  For
+  // plain strings or nameless objects, use positional merge with extra code
+  // defaults appended.
   const mergeArrayField = (defaultArr, remoteArr) => {
     if (!remoteArr || remoteArr.length === 0) return defaultArr;
     if (!defaultArr) return remoteArr;
+
+    // Name-based matching for tier-like objects (have a `name` string field)
+    const hasNamedItems = defaultArr.some(
+      item => item && typeof item === 'object' && hasText(item.name)
+    );
+    if (hasNamedItems) {
+      const usedRemote = new Set();
+      const result = defaultArr.map((dItem, dIdx) => {
+        if (!dItem || typeof dItem !== 'object' || !hasText(dItem.name)) {
+          // Nameless entry (blank template): positional fallback
+          const rItem = remoteArr[dIdx];
+          if (rItem && !usedRemote.has(dIdx)) {
+            usedRemote.add(dIdx);
+            return { ...dItem, ...rItem };
+          }
+          return dItem;
+        }
+        const dName = norm(dItem.name);
+        const rIdx = remoteArr.findIndex((rItem, i) =>
+          !usedRemote.has(i) && rItem && typeof rItem === 'object' &&
+          norm(rItem.name || '') === dName
+        );
+        if (rIdx !== -1) {
+          usedRemote.add(rIdx);
+          return { ...dItem, ...remoteArr[rIdx] };
+        }
+        return dItem;
+      });
+      // Append unmatched remote entries
+      remoteArr.forEach((rItem, i) => {
+        if (!usedRemote.has(i)) result.push(rItem);
+      });
+      return result;
+    }
+
+    // Fallback: positional merge for plain arrays (features, list items, etc.)
     const merged = [...remoteArr];
     for (let i = remoteArr.length; i < defaultArr.length; i++) {
       merged.push(defaultArr[i]);

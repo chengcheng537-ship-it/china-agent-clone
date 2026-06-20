@@ -203,9 +203,20 @@ function deepMergeServicePages(defaultPages, remotePages) {
         }
         return dItem;
       });
-      // Append unmatched remote entries
+      // Append unmatched remote entries (skip duplicates whose name already exists in defaults)
       remoteArr.forEach((rItem, i) => {
-        if (!usedRemote.has(i)) result.push(rItem);
+        if (!usedRemote.has(i)) {
+          // If this remote entry has a name that matches a default entry,
+          // it's a duplicate — the default version was already kept above.
+          if (hasText(rItem?.name)) {
+            const rName = norm(rItem.name);
+            const dup = defaultArr.some(
+              dItem => dItem && typeof dItem === 'object' && hasText(dItem.name) && norm(dItem.name) === rName
+            );
+            if (dup) return;
+          }
+          result.push(rItem);
+        }
       });
       return result;
     }
@@ -262,9 +273,20 @@ function deepMergeServicePages(defaultPages, remotePages) {
         return ds;
       });
 
-      // Append any unmatched remote sections (new sections added by admin)
+      // Append any unmatched remote sections (skip duplicates whose title already exists in defaults)
       remoteSections.forEach((rs, rsIdx) => {
-        if (!usedRemote.has(rsIdx)) ordered.push(rs);
+        if (!usedRemote.has(rsIdx)) {
+          // If this remote section has a title that matches a default section,
+          // it's a duplicate — the default version was already kept above.
+          if (hasText(rs.title)) {
+            const rsNorm = norm(rs.title);
+            const dup = dp.sections.some(
+              ds => hasText(ds.title) && norm(ds.title) === rsNorm
+            );
+            if (dup) return;
+          }
+          ordered.push(rs);
+        }
       });
 
       merged.sections = ordered;

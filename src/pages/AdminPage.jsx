@@ -89,6 +89,30 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
     });
   }
 
+  function removeArrayItem(fieldPath, index) {
+    if (!confirm('Delete this item?')) return;
+    setDraft(prev => {
+      const keys = fieldPath.split('.');
+      const next = Array.isArray(prev) ? [...prev] : { ...prev };
+      let pointer = next;
+      keys.forEach((rawKey, idx) => {
+        const key = Number.isNaN(Number(rawKey)) ? rawKey : Number(rawKey);
+        if (idx === keys.length - 1) {
+          const arr = Array.isArray(pointer[key]) ? [...pointer[key]] : [];
+          arr.splice(index, 1);
+          pointer[key] = arr;
+        } else {
+          const nextValue = pointer[key];
+          const cloned = Array.isArray(nextValue) ? [...nextValue] : { ...nextValue };
+          pointer[key] = cloned;
+          pointer = cloned;
+        }
+      });
+      draftRef.current = next;
+      return next;
+    });
+  }
+
   async function handleSaveClick() {
     setSaveStatus('saving');
     try {
@@ -437,7 +461,16 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
                           <div style={{ marginTop: '0.75rem' }}>
                             <p className="upload-hint" style={{ marginBottom: 0 }}>Tiers:</p>
                             {sec.tiers.map((tier, ti) => (
-                              <div key={ti} style={{ border: '1px dashed var(--border)', borderRadius: 6, padding: '0.75rem', marginTop: '0.5rem' }}>
+                              <div key={ti} style={{ border: '1px dashed var(--border)', borderRadius: 6, padding: '0.75rem', marginTop: '0.5rem', position: 'relative' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => removeArrayItem(`servicePages.${slug}.sections.${si}.tiers`, ti)}
+                                  style={{
+                                    position: 'absolute', top: '0.5rem', right: '0.5rem',
+                                    background: '#fee2e2', border: '1px solid #fca5a5', borderRadius: 4,
+                                    color: '#dc2626', cursor: 'pointer', fontSize: '0.75rem', padding: '0.15rem 0.5rem'
+                                  }}
+                                >✕</button>
                                 <div className="form-grid">
                                   <label>Tier Name<input value={tier.name || ''} onChange={e => updateField(`servicePages.${slug}.sections.${si}.tiers.${ti}.name`, e.target.value)} /></label>
                                 </div>

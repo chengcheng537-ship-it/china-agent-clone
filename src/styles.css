@@ -1011,6 +1011,7 @@ code {
   .site-nav > .nav-dropdown {
     padding: 0.6rem 0;
     border-bottom: 1px solid var(--border);
+    text-align: center;
   }
   .nav-dropdown-menu {
     display: block;
@@ -1030,7 +1031,7 @@ code {
     margin: 0.5rem 0 0 1rem;
     padding: 0.5rem 0;
   }
-  .nav-dropdown-toggle { width: 100%; justify-content: space-between; }
+  .nav-dropdown-toggle { width: 100%; justify-content: center; }
 
   /* Service page mobile */
   .service-hero {

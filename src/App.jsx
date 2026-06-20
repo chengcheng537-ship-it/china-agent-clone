@@ -166,6 +166,9 @@ function loadCache() {
 // than Firebase (e.g. after adding new sections to code defaults).
 function deepMergeServicePages(defaultPages, remotePages) {
   const result = {};
+  // Normalize dollar amounts in remote data so name-based tier matching
+  // won't break when code-default has $95 and remote was saved with $99.
+  sanitizeDollarValues(remotePages);
   const norm = (s) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
   const hasText = (v) => typeof v === 'string' && v.trim().length > 0;
   // Merge items/tiers arrays: for object entries with a `name` field (tiers),

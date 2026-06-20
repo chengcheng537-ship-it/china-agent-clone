@@ -331,7 +331,20 @@ function App() {
   const isAdmin = location.pathname === '/admin';
   const dropdownRef = useRef(null);
 
-  // Close Services dropdown when clicking outside
+  // Scroll to hash anchor (React Router v6 doesn't auto-scroll for same-path hash changes)
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace('#', '');
+      // Small delay ensures the DOM is fully rendered
+      const timer = setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash]);
   useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {

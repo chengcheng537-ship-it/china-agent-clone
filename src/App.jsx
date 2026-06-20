@@ -336,8 +336,22 @@ function normalizeContactLegacy(contact) {
 
 function App() {
   const cached = loadCache();
-  const [content, setContent] = useState(defaultContent);
-  const [loading, setLoading] = useState(true);
+  const [content, setContent] = useState(() => {
+    // Show best available content immediately — no loading screen
+    if (cached) {
+      const merged = {
+        ...defaultContent,
+        ...cached,
+        servicePages: cached.servicePages
+          ? deepMergeServicePages(defaultContent.servicePages, cached.servicePages)
+          : defaultContent.servicePages,
+      };
+      merged.contact = normalizeContactLegacy(merged.contact);
+      return merged;
+    }
+    return defaultContent;
+  });
+  const [loading, setLoading] = useState(false);
   const [firebaseReady, setFirebaseReady] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -378,62 +392,42 @@ function App() {
   useEffect(() => {
     let active = true;
 
-    async function loadContent() {
-      const requestVersion = localSaveVersionRef.current;
+    async function syncContent() {
       try {
         initFirebase();
         setFirebaseReady(true);
 
-        if (cached?._contentVersion) {
-          const remoteVersion = await fetchPublicContentVersion();
-          if (requestVersion !== localSaveVersionRef.current) {
-            return;
-          }
-          if (remoteVersion && String(remoteVersion) === String(cached._contentVersion)) {
-            const merged = {
-              ...defaultContent,
-              ...cached,
-              servicePages: cached.servicePages
-                ? deepMergeServicePages(defaultContent.servicePages, cached.servicePages)
-                : defaultContent.servicePages,
-            };
-            merged.contact = normalizeContactLegacy(merged.contact);
-            setContent(merged);
-            saveCache(merged);
-            setLoading(false);
-            return;
-          }
-        }
+        // Lightweight version check first
+        let remoteVersion = null;
+        try { remoteVersion = await fetchPublicContentVersion(); } catch {}
+        if (!active) return;
 
-        const remote = await fetchPublicContent();
-        if (requestVersion !== localSaveVersionRef.current) {
+        // Cache is up-to-date — nothing to do
+        if (cached?._contentVersion && remoteVersion &&
+            String(remoteVersion) === String(cached._contentVersion)) {
           return;
         }
-        if (remote && active) {
-          // Deep-merge servicePages so code-updated sections (banner, FAQ) appear alongside admin edits
-          const merged = {
-            ...defaultContent,
-            ...remote,
-            servicePages: remote.servicePages
-              ? deepMergeServicePages(defaultContent.servicePages, remote.servicePages)
-              : defaultContent.servicePages,
-          };
-          merged.contact = normalizeContactLegacy(merged.contact);
-          setContent(merged);
-          saveCache(merged);
-          setLoading(false);
-        } else {
-          if (cached) setContent(cached);
-          setLoading(false);
-        }
+
+        // Fetch fresh content and update silently in background
+        const remote = await fetchPublicContent();
+        if (!remote || !active) return;
+
+        const merged = {
+          ...defaultContent,
+          ...remote,
+          servicePages: remote.servicePages
+            ? deepMergeServicePages(defaultContent.servicePages, remote.servicePages)
+            : defaultContent.servicePages,
+        };
+        merged.contact = normalizeContactLegacy(merged.contact);
+        setContent(merged);
+        saveCache(merged);
       } catch (error) {
-        console.warn('Remote content failed to load, using cached/default content.', error.message);
-        if (cached) setContent(cached);
-        setLoading(false);
+        console.warn('Background sync failed, using cached/default content.', error.message);
       }
     }
 
-    loadContent();
+    syncContent();
     return () => { active = false; };
   }, []);
 

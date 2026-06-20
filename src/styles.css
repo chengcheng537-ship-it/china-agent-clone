@@ -983,7 +983,6 @@ code {
 
   .site-header {
     flex-wrap: wrap;
-    justify-content: center;
     gap: 0.75rem;
   }
 
@@ -1015,12 +1014,22 @@ code {
     border-bottom: 1px solid var(--border);
   }
   .nav-dropdown-menu {
+    display: block;
+    max-height: 0;
+    overflow: hidden;
     position: static;
     box-shadow: none;
     border: none;
-    margin: 0.5rem 0 0 1rem;
+    margin: 0;
+    padding: 0;
     min-width: auto;
     transform: none;
+    transition: max-height 0.3s ease, margin 0.3s ease;
+  }
+  .nav-dropdown.open .nav-dropdown-menu {
+    max-height: 500px;
+    margin: 0.5rem 0 0 1rem;
+    padding: 0.5rem 0;
   }
   .nav-dropdown-toggle { width: 100%; justify-content: space-between; }
 

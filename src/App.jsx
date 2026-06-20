@@ -330,6 +330,12 @@ function App() {
   const location = useLocation();
   const isAdmin = location.pathname === '/admin';
   const dropdownRef = useRef(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  // Close mobile nav on route change
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [location.pathname, location.hash]);
 
   // Scroll to hash anchor (React Router v6 doesn't auto-scroll for same-path hash changes)
   useEffect(() => {
@@ -476,10 +482,10 @@ function App() {
       {!isAdmin && (
         <header className="site-header">
           <div className="brand"><Link to="/"><img src="/logo.png" alt="EastLink Solutions" className="brand-logo" /></Link></div>
-          <button className="nav-toggle" aria-label="Toggle menu" onClick={() => document.querySelector('.site-nav').classList.toggle('nav-open')}>
+          <button className="nav-toggle" aria-label="Toggle menu" onClick={() => setMobileNavOpen(prev => !prev)}>
             <span></span><span></span><span></span>
           </button>
-          <nav className="site-nav">
+          <nav className={`site-nav${mobileNavOpen ? ' nav-open' : ''}`}>
             <Link to="/">Home</Link>
             <Link to="/#inquiry">About Us</Link>
             <div className="nav-dropdown" ref={dropdownRef}>

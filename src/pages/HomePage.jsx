@@ -161,18 +161,22 @@ function HomePage({ content, loading }) {
                 <span>{content.contact.companyName}</span>
               </div>
             )}
-            {(content.contact.phones || []).map((phone, i) => (
-              <div className="contact-item" key={`p${i}`}>
+            {(content.contact.phones || []).length > 0 && (
+              <div className="contact-item">
                 <strong>Phone</strong>
-                <span>{phone}</span>
+                {(content.contact.phones || []).map((phone, i) => (
+                  <span key={`p${i}`}>{phone}</span>
+                ))}
               </div>
-            ))}
-            {(content.contact.emails || []).map((email, i) => (
-              <div className="contact-item" key={`e${i}`}>
+            )}
+            {(content.contact.emails || []).length > 0 && (
+              <div className="contact-item">
                 <strong>Email</strong>
-                <span>{email}</span>
+                {(content.contact.emails || []).map((email, i) => (
+                  <span key={`e${i}`}>{email}</span>
+                ))}
               </div>
-            ))}
+            )}
             <div className="contact-item">
               <strong>Address</strong>
               <span>{content.contact.address}</span>
@@ -180,7 +184,7 @@ function HomePage({ content, loading }) {
           </div>
         </div>
 
-        <form className="contact-form" onSubmit={handleSubmit}>
+        <form className="contact-form" id="inquiry" onSubmit={handleSubmit}>
           <label>
             Name
             <input

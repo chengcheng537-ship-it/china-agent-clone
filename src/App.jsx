@@ -468,7 +468,7 @@ function App() {
           </button>
           <nav className="site-nav">
             <Link to="/">Home</Link>
-            <Link to="/#about">About Us</Link>
+            <Link to="/#inquiry">About Us</Link>
             <div className="nav-dropdown" ref={dropdownRef}>
               <button className="nav-dropdown-toggle" onClick={(e) => {
                 e.stopPropagation();
@@ -482,7 +482,7 @@ function App() {
                 <Link to="/services/fixer">{content.servicePages?.fixer?.navLabel || 'Fixer'}</Link>
               </div>
             </div>
-            <Link to="/#contact">Contact Us</Link>
+            <Link to="/#inquiry">Contact Us</Link>
           </nav>
         </header>
       )}

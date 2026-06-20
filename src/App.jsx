@@ -114,8 +114,9 @@ const defaultContent = {
   contact: {
     title: 'Contact Us',
     lead: 'Fill out the form below, or reach us directly by email or phone.',
-    phone: '+86 135 2208 6875',
-    email: 'hello@eastlink-solutions.com',
+    companyName: '',
+    phones: ['+86 135 2208 6875'],
+    emails: ['hello@eastlink-solutions.com'],
     address: 'Guangzhou / Hong Kong'
   },
   seo: {
@@ -304,6 +305,22 @@ function saveCache(data) {
   } catch { /* quota exceeded, ignore */ }
 }
 
+function normalizeContactLegacy(contact) {
+  if (!contact) return contact;
+  const c = { ...contact };
+  // Convert old single-string phone to phones array
+  if (typeof c.phone === 'string') {
+    if (!c.phones || c.phones.length === 0) c.phones = [c.phone];
+    delete c.phone;
+  }
+  // Convert old single-string email to emails array
+  if (typeof c.email === 'string') {
+    if (!c.emails || c.emails.length === 0) c.emails = [c.email];
+    delete c.email;
+  }
+  return c;
+}
+
 function App() {
   const cached = loadCache();
   const [content, setContent] = useState(cached || defaultContent);
@@ -347,6 +364,7 @@ function App() {
               ? deepMergeServicePages(defaultContent.servicePages, remote.servicePages)
               : defaultContent.servicePages,
           };
+          merged.contact = normalizeContactLegacy(merged.contact);
           setContent(merged);
           saveCache(merged);
           if (!cached) setLoading(false);

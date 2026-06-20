@@ -31,7 +31,7 @@ function HomePage({ content, loading }) {
     const body = encodeURIComponent(
       `Name: ${form.name}\nCompany: ${form.company || 'N/A'}\nEmail: ${form.email}\n\nMessage:\n${form.message}`
     );
-    window.location.href = `mailto:${content.contact.email}?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${(content.contact.emails || [])[0] || ''}?subject=${subject}&body=${body}`;
     setSubmitted(true);
   }
 
@@ -155,14 +155,24 @@ function HomePage({ content, loading }) {
           <h2>{content.about.title}</h2>
           <p>{content.about.content}</p>
           <div className="about-contact">
-            <div className="contact-item">
-              <strong>Phone</strong>
-              <span>{content.contact.phone}</span>
-            </div>
-            <div className="contact-item">
-              <strong>Email</strong>
-              <span>{content.contact.email}</span>
-            </div>
+            {content.contact.companyName && (
+              <div className="contact-item">
+                <strong>Company</strong>
+                <span>{content.contact.companyName}</span>
+              </div>
+            )}
+            {(content.contact.phones || []).map((phone, i) => (
+              <div className="contact-item" key={`p${i}`}>
+                <strong>Phone</strong>
+                <span>{phone}</span>
+              </div>
+            ))}
+            {(content.contact.emails || []).map((email, i) => (
+              <div className="contact-item" key={`e${i}`}>
+                <strong>Email</strong>
+                <span>{email}</span>
+              </div>
+            ))}
             <div className="contact-item">
               <strong>Address</strong>
               <span>{content.contact.address}</span>
@@ -213,16 +223,6 @@ function HomePage({ content, loading }) {
           </button>
           {submitted && <p className="form-success">Email draft ready — please complete sending in your mail client.</p>}
         </form>
-      </section>
-
-      <section className="section cta-section">
-        <div className="cta-panel">
-          <h2>Don't Let "Looks Fine" Become Your Procurement Trap</h2>
-          <p>Get on-site evidence first, then decide your next move. Contact us for a first-hand risk assessment.</p>
-          <a className="button button-secondary" href={`mailto:${content.contact.email}`}>
-            Email Us Now
-          </a>
-        </div>
       </section>
     </div>
   );

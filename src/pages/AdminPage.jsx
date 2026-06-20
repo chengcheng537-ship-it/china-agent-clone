@@ -506,11 +506,33 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
               {/* ========== Contact ========== */}
               <div className="form-group">
                 <h2>Contact Info</h2>
-                <div className="form-grid">
-                  <label>Phone<input value={draft.contact?.phone || ''} onChange={e => updateField('contact.phone', e.target.value)} /></label>
-                  <label>Email<input value={draft.contact?.email || ''} onChange={e => updateField('contact.email', e.target.value)} /></label>
+                <label>Company Name<input value={draft.contact?.companyName || ''} onChange={e => updateField('contact.companyName', e.target.value)} placeholder="e.g. EastLink Solutions Ltd." /></label>
+
+                <div style={{ marginTop: '1rem' }}>
+                  <p className="upload-hint" style={{ marginBottom: 0 }}>Phone Numbers:</p>
+                  {(draft.contact?.phones || []).map((phone, i) => (
+                    <div key={i} style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
+                      <input style={{ flex: 1 }} placeholder={`Phone ${i + 1}`} value={phone || ''} onChange={e => updateField(`contact.phones.${i}`, e.target.value)} />
+                    </div>
+                  ))}
+                  <button type="button" className="button-outline" style={{ marginTop: '0.5rem', fontSize: '0.8rem', padding: '0.35rem 0.85rem' }} onClick={() => appendArrayItem('contact.phones', '')}>
+                    ＋ Add Phone
+                  </button>
                 </div>
-                <label>Address<input value={draft.contact?.address || ''} onChange={e => updateField('contact.address', e.target.value)} /></label>
+
+                <div style={{ marginTop: '1rem' }}>
+                  <p className="upload-hint" style={{ marginBottom: 0 }}>Email Addresses:</p>
+                  {(draft.contact?.emails || []).map((email, i) => (
+                    <div key={i} style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
+                      <input style={{ flex: 1 }} placeholder={`Email ${i + 1}`} value={email || ''} onChange={e => updateField(`contact.emails.${i}`, e.target.value)} />
+                    </div>
+                  ))}
+                  <button type="button" className="button-outline" style={{ marginTop: '0.5rem', fontSize: '0.8rem', padding: '0.35rem 0.85rem' }} onClick={() => appendArrayItem('contact.emails', '')}>
+                    ＋ Add Email
+                  </button>
+                </div>
+
+                <label style={{ marginTop: '1rem' }}>Address<input value={draft.contact?.address || ''} onChange={e => updateField('contact.address', e.target.value)} /></label>
               </div>
 
               {/* ========== Inquiries ========== */}

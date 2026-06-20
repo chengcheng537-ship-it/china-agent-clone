@@ -1031,6 +1031,7 @@ code {
     margin: 0.5rem 0 0 1rem;
     padding: 0.5rem 0;
   }
+  .nav-dropdown-menu a { text-align: left; }
   .nav-dropdown-toggle { width: 100%; justify-content: center; }
 
   /* Service page mobile */

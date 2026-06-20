@@ -99,6 +99,12 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
         const key = Number.isNaN(Number(rawKey)) ? rawKey : Number(rawKey);
         if (idx === keys.length - 1) {
           const arr = Array.isArray(pointer[key]) ? [...pointer[key]] : [];
+          const removed = arr[index];
+          if (key === 'tiers' && removed?.name) {
+            const deletedNames = Array.isArray(pointer._deletedTierNames) ? [...pointer._deletedTierNames] : [];
+            if (!deletedNames.includes(removed.name)) deletedNames.push(removed.name);
+            pointer._deletedTierNames = deletedNames;
+          }
           arr.splice(index, 1);
           pointer[key] = arr;
         } else {

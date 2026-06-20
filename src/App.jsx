@@ -180,68 +180,36 @@ function deepMergeServicePages(defaultPages, remotePages) {
   sanitizeDollarValues(remotePages);
   const norm = (s) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
   const hasText = (v) => typeof v === 'string' && v.trim().length > 0;
-  // Merge items/tiers arrays: for object entries with a `name` field (tiers),
-  // match by normalised name so code-default reordering takes effect.  For
-  // plain strings or nameless objects, use positional merge with extra code
-  // defaults appended.
-  const mergeArrayField = (defaultArr, remoteArr, deletedNames = []) => {
-    const deletedNameSet = new Set((deletedNames || []).map(name => norm(name)));
-    if (!remoteArr || remoteArr.length === 0) {
-      return deletedNameSet.size === 0
-        ? defaultArr
-        : defaultArr?.filter(item => !hasText(item?.name) || !deletedNameSet.has(norm(item.name)));
-    }
+  // Merge items/tiers arrays: for named entries (tiers), remote is the
+  // source of truth.  Deleted tiers won't reappear.  Code defaults only
+  // provide initial content when remote is empty, and field-level fallback
+  // for matched entries.
+  const mergeArrayField = (defaultArr, remoteArr) => {
+    if (!remoteArr || remoteArr.length === 0) return defaultArr;
     if (!defaultArr) return remoteArr;
-    remoteArr.forEach(item => {
-      if (hasText(item?.name)) deletedNameSet.delete(norm(item.name));
-    });
 
     // Name-based matching for tier-like objects (have a `name` string field)
     const hasNamedItems = defaultArr.some(
       item => item && typeof item === 'object' && hasText(item.name)
     );
     if (hasNamedItems) {
-      const usedRemote = new Set();
-      const result = defaultArr.map((dItem, dIdx) => {
-        if (!dItem || typeof dItem !== 'object' || !hasText(dItem.name)) {
-          // Nameless entry (blank template): positional fallback
-          const rItem = remoteArr[dIdx];
-          if (rItem && !usedRemote.has(dIdx)) {
-            usedRemote.add(dIdx);
-            return { ...dItem, ...rItem };
-          }
-          return dItem;
+      // Remote-first: only remote entries drive the result.
+      const usedDefault = new Set();
+      return remoteArr.map((rItem) => {
+        if (!rItem || typeof rItem !== 'object' || !hasText(rItem.name)) {
+          return rItem;
         }
-        const dName = norm(dItem.name);
-        if (deletedNameSet.has(dName)) {
-          return null;
-        }
-        const rIdx = remoteArr.findIndex((rItem, i) =>
-          !usedRemote.has(i) && rItem && typeof rItem === 'object' &&
-          norm(rItem.name || '') === dName
+        const rName = norm(rItem.name);
+        const dIdx = defaultArr.findIndex((dItem, i) =>
+          !usedDefault.has(i) && dItem && typeof dItem === 'object' &&
+          norm(dItem.name || '') === rName
         );
-        if (rIdx !== -1) {
-          usedRemote.add(rIdx);
-          return { ...dItem, ...remoteArr[rIdx] };
+        if (dIdx !== -1) {
+          usedDefault.add(dIdx);
+          return { ...defaultArr[dIdx], ...rItem };
         }
-        return dItem;
-      }).filter(Boolean);
-      // Append unmatched remote entries (skip duplicates whose name already exists in defaults)
-      remoteArr.forEach((rItem, i) => {
-        if (!usedRemote.has(i)) {
-          // If this remote entry has a name that matches a default entry,
-          // it's a duplicate — the default version was already kept above.
-          if (hasText(rItem?.name)) {
-            const rName = norm(rItem.name);
-            const dup = defaultArr.some(
-              dItem => dItem && typeof dItem === 'object' && hasText(dItem.name) && norm(dItem.name) === rName
-            );
-            if (dup) return;
-          }
-          result.push(rItem);
-        }
+        return rItem;
       });
-      return result;
     }
 
     // Fallback: positional merge for plain arrays (features, list items, etc.)
@@ -270,7 +238,7 @@ function deepMergeServicePages(defaultPages, remotePages) {
           if (titleMatchIdx !== -1) {
             usedRemote.add(titleMatchIdx);
             const rs = remoteSections[titleMatchIdx];
-            return { ...ds, ...rs, items: mergeArrayField(ds.items, rs.items), tiers: mergeArrayField(ds.tiers, rs.tiers, rs._deletedTierNames) };
+            return { ...ds, ...rs, items: mergeArrayField(ds.items, rs.items), tiers: mergeArrayField(ds.tiers, rs.tiers) };
           }
         }
 
@@ -289,7 +257,7 @@ function deepMergeServicePages(defaultPages, remotePages) {
             if (belongsToOther) return ds;
           }
           usedRemote.add(dsIdx);
-          return { ...ds, ...rs, items: mergeArrayField(ds.items, rs.items), tiers: mergeArrayField(ds.tiers, rs.tiers, rs._deletedTierNames) };
+          return { ...ds, ...rs, items: mergeArrayField(ds.items, rs.items), tiers: mergeArrayField(ds.tiers, rs.tiers) };
         }
 
         // Step 3 — keep code default

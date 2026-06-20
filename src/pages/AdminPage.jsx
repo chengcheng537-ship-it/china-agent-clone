@@ -521,6 +521,14 @@ function AdminPage({ content, loading, firebaseReady, onSave, onUpload, onBack }
                                 </div>
                               </div>
                             ))}
+                            <button
+                              type="button"
+                              className="button-outline"
+                              style={{ marginTop: '0.75rem', fontSize: '0.8rem', padding: '0.35rem 0.85rem' }}
+                              onClick={() => appendArrayItem(`servicePages.${slug}.sections.${si}.tiers`, { name: '', desc: '', features: [] })}
+                            >
+                              ＋ Add Tier
+                            </button>
                           </div>
                         )}
 

@@ -772,8 +772,7 @@ button, input, textarea {
 
 @media (max-width: 720px) {
   .site-header {
-    flex-direction: column;
-    align-items: stretch;
+    flex-wrap: wrap;
   }
 
   .service-card,
@@ -998,7 +997,7 @@ code {
   }
 
   .brand { flex: 1; }
-  .nav-toggle { display: flex; }
+  .nav-toggle { display: flex; margin-left: auto; }
 
   .site-nav {
     display: none;

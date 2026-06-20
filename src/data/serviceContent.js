@@ -145,7 +145,8 @@ const servicePages = {
           { name: 'Pre-Wire Review — $595', desc: 'Before you wire the deposit, we read the order document. We send it back marked up with the clauses you need to add. 2 business days.', features: ['Light supplier check', 'PI/PO marked up with clauses', 'NNN basics, payment terms, IP protection', 'Written explanation of each clause'] },
           { name: 'PO/PI Contract — $1,295', desc: 'Full contract language embedded in your PO/PI. Bilingual, NNN clauses, quality + delivery + penalty terms, Chinese court jurisdiction.', features: ['Bilingual contract language', 'NNN (Non-disclosure, Non-use, Non-circumvention)', 'Quality + delivery + penalty terms', 'Chop verification logic built in'] },
           { name: 'MASTER Contract — $1,995', desc: 'The standalone master contract. Signed once. Every future PO references it. Persists across multiple orders.', features: ['Standalone bilingual master contract', 'Signed and chopped separately', 'Persists across multiple POs', 'We coordinate chop with supplier'] },
-          { name: 'Manufacturing Agreement — $2,650', desc: 'MASTER Contract + manufacturing-specific terms: line allocation, mold ownership, raw material traceability, confidentiality.', features: ['Everything in MASTER Contract', 'Manufacturing-specific terms', 'Raw material sourcing + traceability', 'Reviewed by senior legal partner'] }
+          { name: 'Manufacturing Agreement — $2,650', desc: 'MASTER Contract + manufacturing-specific terms: line allocation, mold ownership, raw material traceability, confidentiality.', features: ['Everything in MASTER Contract', 'Manufacturing-specific terms', 'Raw material sourcing + traceability', 'Reviewed by senior legal partner'] },
+          { name: '', desc: '', features: [''] }
         ]
       },
       {
